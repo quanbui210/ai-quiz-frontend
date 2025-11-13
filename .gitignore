@@ -37,3 +37,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+AUTHENTICATION.md
+ENV_SETUP.md
+SETUP.md
+
+BACKEND_CALLBACK_CONFIG.md
+CALLBACK_FLOW.md
+FRONTEND_CALLBACK_CONFIG.md
+TESTING.md
