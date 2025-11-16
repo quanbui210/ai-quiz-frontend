@@ -1,22 +1,28 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 
 export default function Home() {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, isAdmin } = useAuth()
+  const hasRedirectedRef = useRef(false)
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true
       if (isAuthenticated) {
-        router.push("/dashboard")
+        if (isAdmin) {
+          router.push("/admin/dashboard")
+        } else {
+          router.push("/dashboard")
+        }
       } else {
         router.push("/login")
       }
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, isAdmin, router])
 
   return (
     <div className="flex min-h-screen items-center justify-center">

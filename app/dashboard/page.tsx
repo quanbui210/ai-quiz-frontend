@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { MainLayout } from "@/components/layout/main-layout"
@@ -15,6 +15,7 @@ import {
 import { API_ENDPOINTS } from "@/lib/constants"
 import { AnalyticsResponse } from "@/types/api"
 import { useAPI } from "@/hooks/use-api"
+import { useSubscription } from "@/hooks/use-subscription"
 import {
   LineChart,
   Line,
@@ -30,9 +31,17 @@ type TimeRange = "last7Days" | "last30Days" | "last90Days"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading, isAdmin } = useAuth()
   const [timeRange, setTimeRange] = useState<TimeRange>("last7Days")
   const [displayName, setDisplayName] = useState<string>("User")
+  const { subscription, usage } = useSubscription()
+  const hasRedirectedRef = useRef(false)
+
+  useEffect(() => {
+    if (isAdmin) {
+      console.log("Admin detected, redirecting to admin dashboard")
+    }
+  }, [isAdmin])
 
   const { data: analyticsData, isLoading: isLoadingAnalytics, error: analyticsError } = useAPI<AnalyticsResponse | { analytics?: AnalyticsResponse; data?: AnalyticsResponse }>(
     isAuthenticated ? API_ENDPOINTS.ANALYTICS.ME : null,
@@ -71,17 +80,46 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login")
+    if (!isLoading) {
+      if (isAdmin && !hasRedirectedRef.current) {
+        hasRedirectedRef.current = true
+        router.replace("/admin/dashboard")
+        return
+      }
+      if (!isAuthenticated) {
+        router.replace("/login")
+      }
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAdmin, isLoading, isAuthenticated, router])
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isAdmin) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Redirecting to admin dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Redirecting to login...</p>
         </div>
       </div>
     )
@@ -250,6 +288,33 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
+
+            {/* {subscription && usage && (
+              <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-700">
+                        {subscription.plan.name}
+                      </span>
+                      <span className="text-xs text-gray-500">•</span>
+                      <span className="text-xs text-gray-600">
+                        {usage.topicsCount}/{subscription.maxTopics} topics
+                      </span>
+                      <span className="text-xs text-gray-500">•</span>
+                      <span className="text-xs text-gray-600">
+                        {usage.quizzesCount}/{subscription.maxQuizzes} quizzes
+                      </span>
+                    </div>
+                  </div>
+                  <Link href="/subscription">
+                    <Button variant="ghost" size="sm" className="h-7 text-xs">
+                      Manage
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )} */}
 
             {analytics?.time && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

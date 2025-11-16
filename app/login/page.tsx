@@ -1,10 +1,12 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { useAuthStore } from "@/stores/use-auth-store"
 import { Button } from "@/components/ui/button"
+import { Shield } from "lucide-react"
+import Link from "next/link"
 import {
   Chrome,
   BookOpen,
@@ -28,7 +30,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export default function LoginPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { login, handleCallback, isAuthenticated, isLoading } = useAuth()
+  const { login, handleCallback, isAuthenticated, isLoading, isAdmin } = useAuth()
   const setLoading = useAuthStore((state) => state.setLoading)
 
   useEffect(() => {
@@ -41,27 +43,53 @@ export default function LoginPage() {
     } else if (code) {
       handleCallback(code)
     } else {
-      // If no code and no error, user might have cancelled or navigated back
-      // Only clear loading state after a delay to ensure we're not in the middle of redirecting
-      // This prevents clearing the state immediately when login button is clicked
+    
       if (isLoading && !isAuthenticated) {
         const timer = setTimeout(() => {
-          // Only clear if we're still on login page and still loading
-          // This means user likely cancelled or navigated back
+         
           if (window.location.pathname === "/login") {
             setLoading(false)
           }
-        }, 2000) // Wait 2 seconds to ensure redirect has time to happen
+        }, 2000) 
         return () => clearTimeout(timer)
       }
     }
   }, [searchParams, handleCallback, isLoading, isAuthenticated, setLoading])
 
+  const hasRedirectedRef = useRef(false)
+
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard")
+    if (!isLoading && isAuthenticated && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true
+      if (isAdmin) {
+        router.push("/admin/dashboard")
+      } else {
+        router.push("/dashboard")
+      }
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, isLoading, isAdmin, router])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleGoogleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
@@ -130,15 +158,35 @@ export default function LoginPage() {
                   <p className="text-sm font-medium text-gray-700 mb-4">
                     Get started in seconds
                   </p>
-                  <Button
-                    onClick={handleGoogleLogin}
-                    disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                    size="lg"
-                  >
-                    <Chrome className="mr-2 h-5 w-5" />
-                    {isLoading ? "Signing in..." : "Sign in with Google"}
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      onClick={handleGoogleLogin}
+                      disabled={isLoading}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                      size="lg"
+                    >
+                      <Chrome className="mr-2 h-5 w-5" />
+                      {isLoading ? "Signing in..." : "Sign in with Google"}
+                    </Button>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white/80 px-2 text-gray-500">Or</span>
+                      </div>
+                    </div>
+                    <Link href="/admin/login" className="block">
+                      <Button
+                        variant="outline"
+                        className="w-full border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                        size="lg"
+                      >
+                        <Shield className="mr-2 h-5 w-5" />
+                        Login as Admin
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
 

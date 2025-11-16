@@ -29,9 +29,14 @@ interface AuthState {
   session: Session | null
   isAuthenticated: boolean
   isLoading: boolean
+  isAdmin: boolean
+  admin: {
+    role: string
+    permissions: string[]
+  } | null
 
   setAuth: (data: AuthLoginResponse | AuthSessionResponse) => void
-  setUser: (user: SupabaseUser | null) => void
+  setUser: (user: SupabaseUser | null, adminData?: { isAdmin?: boolean; admin?: { role: string; permissions: string[] } | null }) => void
   setSession: (session: Session | null) => void
   logout: () => void
   setLoading: (loading: boolean) => void
@@ -45,6 +50,8 @@ export const useAuthStore = create<AuthState>()(
         session: null,
         isAuthenticated: false,
         isLoading: false,
+        isAdmin: false,
+        admin: null,
 
         setAuth: (data: AuthLoginResponse | AuthSessionResponse) => {
           // Backend returns user with Supabase structure (same ID as Prisma now)
@@ -55,14 +62,18 @@ export const useAuthStore = create<AuthState>()(
             user,
             session,
             isAuthenticated: !!user && !!session,
+            isAdmin: data.isAdmin || false,
+            admin: data.admin || null,
           })
         },
 
-        setUser: (user: SupabaseUser | null) => {
+        setUser: (user: SupabaseUser | null, adminData?: { isAdmin?: boolean; admin?: { role: string; permissions: string[] } | null }) => {
           const currentState = get()
           set({
             user,
             isAuthenticated: !!user && !!currentState.session,
+            isAdmin: adminData?.isAdmin || false,
+            admin: adminData?.admin || null,
           })
         },
 
@@ -73,12 +84,13 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: !!session && !!currentState.user,
           })
         },
-
         logout: () => {
           set({
             user: null,
             session: null,
             isAuthenticated: false,
+            isAdmin: false,
+            admin: null,
           })
         },
 

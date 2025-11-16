@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/stores/use-auth-store"
 import { useAPI } from "./use-api"
@@ -12,11 +12,29 @@ import {
 
 export function useAuth() {
   const router = useRouter()
+  const [hasHydrated, setHasHydrated] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("auth-storage")
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed.state) {
+            return true
+          }
+        }
+      } catch (e) {
+        // Invalid storage
+      }
+    }
+    return true
+  })
   const {
     user,
     session,
     isAuthenticated,
     isLoading,
+    isAdmin,
+    admin,
     setAuth,
     setUser,
     logout: clearAuth,
@@ -28,12 +46,13 @@ export function useAuth() {
     mutate: refetchSession,
     error: sessionError,
   } = useAPI<AuthSessionResponse>(
-    isAuthenticated ? API_ENDPOINTS.AUTH.SESSION : null,
+    hasHydrated && session && session.access_token ? API_ENDPOINTS.AUTH.SESSION : null,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
       onErrorRetry: () => {},
       errorRetryCount: 0,
+      shouldRetryOnError: false,
     }
   )
 
@@ -41,27 +60,35 @@ export function useAuth() {
     data: userData,
     mutate: refetchUser,
     error: userError,
-  } = useAPI<AuthMeResponse>(isAuthenticated ? API_ENDPOINTS.AUTH.ME : null, {
+  } = useAPI<AuthMeResponse>(hasHydrated && session && session.access_token ? API_ENDPOINTS.AUTH.ME : null, {
     revalidateOnFocus: false,
     revalidateOnReconnect: true,
     onErrorRetry: () => {},
     errorRetryCount: 0,
+    shouldRetryOnError: false,
   })
 
   useEffect(() => {
+    if (!session || !session.access_token) {
+      return
+    }
+
     const sessionIs401 =
-      sessionError && (sessionError as any)?.response?.status === 401
-    const userIs401 = userError && (userError as any)?.response?.status === 401
+      sessionError && ((sessionError as any)?.response?.status === 401 || (sessionError as any)?.status === 401)
+    const userIs401 = userError && ((userError as any)?.response?.status === 401 || (userError as any)?.status === 401)
 
     if (sessionIs401 || userIs401) {
       clearAuth()
       router.push("/login")
     }
-  }, [sessionError, userError, clearAuth, router])
+  }, [session, sessionError, userError, clearAuth, router])
 
   useEffect(() => {
     if (userData?.user) {
-      setUser(userData.user as any)
+      setUser(userData.user as any, {
+        isAdmin: userData.isAdmin,
+        admin: userData.admin || null,
+      })
     }
   }, [userData, setUser])
 
@@ -161,6 +188,8 @@ export function useAuth() {
     session,
     isAuthenticated,
     isLoading: isLoading || isSigningOut,
+    isAdmin,
+    admin,
     login,
     signOut,
     handleCallback,

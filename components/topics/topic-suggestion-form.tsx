@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Wand2, Loader2, Check, X, Lightbulb, Zap } from "lucide-react"
+import { Wand2, Loader2, Check, X, Lightbulb, Zap, AlertCircle } from "lucide-react"
 import { TopicSuggestResponse, TopicCreateResponse } from "@/types/api"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { useMutation } from "@/hooks/use-mutation"
+import { useSubscription } from "@/hooks/use-subscription"
 
 export function TopicSuggestionForm() {
   const router = useRouter()
@@ -15,6 +16,8 @@ export function TopicSuggestionForm() {
   const [selectedTopic, setSelectedTopic] = useState<string>("")
   const [isSuggesting, setIsSuggesting] = useState(false)
   const [suggestError, setSuggestError] = useState<string | null>(null)
+
+  const { usage, subscription } = useSubscription()
 
   const { mutate: createTopic, isLoading: isCreating, error: createError } = useMutation<TopicCreateResponse>("post", {
     onSuccess: (data) => {
@@ -45,6 +48,13 @@ export function TopicSuggestionForm() {
       return
     }
 
+    if (usage && usage.topicsRemaining <= 0) {
+      setSuggestError(
+        `You've reached your topic limit (${usage.topicsCount}/${subscription?.maxTopics || 0}). Please upgrade your plan to create more topics.`
+      )
+      return
+    }
+
     setSuggestError(null)
 
     try {
@@ -56,11 +66,13 @@ export function TopicSuggestionForm() {
     }
   }
 
+  const isAtLimit = usage && usage.topicsRemaining <= 0
+
   const finalTopic = selectedTopic || userTopic.trim()
 
   return (
     <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-      {/* Input Section */}
+     
       <div className="space-y-4">
         <div>
           <label
@@ -145,6 +157,23 @@ export function TopicSuggestionForm() {
             Selected Topic:
           </p>
           <p className="text-base text-blue-800">{finalTopic}</p>
+        </div>
+      )}
+
+      {/* Usage Limit Warning */}
+      {usage && (
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">
+              Topics: {usage.topicsCount} / {subscription?.maxTopics || 0}
+            </span>
+            {isAtLimit && (
+              <span className="flex items-center gap-1 text-sm text-orange-600">
+                <AlertCircle className="h-4 w-4" />
+                Limit reached
+              </span>
+            )}
+          </div>
         </div>
       )}
 

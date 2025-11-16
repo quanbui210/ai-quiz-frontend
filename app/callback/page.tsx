@@ -1,17 +1,24 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/stores/use-auth-store"
 import { AuthLoginResponse } from "@/types/api"
+import { API_ENDPOINTS } from "@/lib/constants"
+import { apiClient } from "@/lib/api/client"
 
 export default function CallbackPage() {
   const router = useRouter()
   const { setAuth } = useAuthStore()
   const [error, setError] = useState<string | null>(null)
+  const hasProcessedRef = useRef(false)
 
   useEffect(() => {
+    if (hasProcessedRef.current) return
+
     const handleHashCallback = async (): Promise<void> => {
+      if (hasProcessedRef.current) return
+      hasProcessedRef.current = true
       try {
         const hash = window.location.hash.substring(1) 
         const params = new URLSearchParams(hash)
@@ -64,7 +71,11 @@ export default function CallbackPage() {
 
         setAuth(data)
 
-        router.push("/dashboard")
+        if (data.isAdmin) {
+          router.push("/admin/dashboard")
+        } else {
+          router.push("/dashboard")
+        }
       } catch (err) {
         console.error("Callback error:", err)
         setError(err instanceof Error ? err.message : "Unknown error")

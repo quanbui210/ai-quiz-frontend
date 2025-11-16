@@ -22,7 +22,6 @@ export function useMutation<T = any>(
     try {
       const result = await apiMutations[method]<T>(url, data)
       options?.onSuccess?.(result)
-      console.log("result", result)
       return result
     } catch (err: any) {
       let error: Error

@@ -29,6 +29,22 @@ export const API_ENDPOINTS = {
   ANALYTICS: {
     ME: "/api/v1/results/analytics/me",
   },
+  SUBSCRIPTION: {
+    PLANS: "/api/v1/subscription/plans",
+    ME: "/api/v1/subscription/me",
+    CREATE_CHECKOUT: "/api/v1/subscription/create-checkout",
+    CANCEL: "/api/v1/subscription/cancel",
+    RESUME: "/api/v1/subscription/resume",
+    PORTAL: "/api/v1/subscription/portal",
+  },
+  ADMIN: {
+    DASHBOARD: "/api/v1/admin/dashboard",
+    USERS: "/api/v1/admin/users",
+    USER: (userId: string) => `/api/v1/admin/users/${userId}`,
+    USER_LIMITS: (userId: string) => `/api/v1/admin/users/${userId}/limits`,
+    USER_SUBSCRIPTION: (userId: string) => `/api/v1/admin/users/${userId}/subscription`,
+    PLANS: "/api/v1/admin/plans",
+  },
 } as const
 
 export const APP_CONFIG = {

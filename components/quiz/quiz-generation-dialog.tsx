@@ -34,6 +34,7 @@ import { API_ENDPOINTS } from "@/lib/constants"
 import { Difficulty, QuizType } from "@/types/prisma"
 import { useAuth } from "@/hooks/use-auth"
 import { useMutation } from "@/hooks/use-mutation"
+import { useSubscription } from "@/hooks/use-subscription"
 
 interface QuizGenerationDialogProps {
   open: boolean
@@ -68,6 +69,7 @@ export function QuizGenerationDialog({
 }: QuizGenerationDialogProps) {
   const router = useRouter()
   const { user } = useAuth()
+  const { subscription, usage } = useSubscription()
   const [quizName, setQuizName] = useState("")
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [selectedSuggestion, setSelectedSuggestion] = useState<string>("")
@@ -81,6 +83,7 @@ export function QuizGenerationDialog({
   >("15")
   const [customTimerMinutes, setCustomTimerMinutes] = useState<string>("")
   const [questionCount, setQuestionCount] = useState<number>(10)
+  const [selectedModel, setSelectedModel] = useState<string>("")
   const [isValidating, setIsValidating] = useState(false)
   const [validationResult, setValidationResult] = useState<{
     isValid: boolean
@@ -184,6 +187,9 @@ export function QuizGenerationDialog({
       setValidationResult(null)
       setError(null) 
       setIsTypingManually(false)
+      if (subscription?.allowedModels && subscription.allowedModels.length > 0) {
+        setSelectedModel(subscription.allowedModels[0])
+      }
       if (topicName.trim()) {
         setError(null)
         suggestQuiz(API_ENDPOINTS.QUIZ.SUGGEST_TOPIC, {
@@ -191,7 +197,7 @@ export function QuizGenerationDialog({
         })
       }
     }
-  }, [open, topicName])
+  }, [open, topicName, subscription])
 
  
   useEffect(() => {
@@ -241,6 +247,18 @@ export function QuizGenerationDialog({
       return
     }
 
+    if (usage && usage.quizzesRemaining <= 0) {
+      setError(
+        `You've reached your quiz limit (${usage.quizzesCount}/${subscription?.maxQuizzes || 0}). Please upgrade your plan to create more quizzes.`
+      )
+      return
+    }
+
+    if (!selectedModel || !subscription?.allowedModels.includes(selectedModel)) {
+      setError("Please select a valid AI model")
+      return
+    }
+
     const timerMs = getTimerInMilliseconds()
     if (timerMs !== null && timerMs <= 0) {
       setError("Please set a valid timer")
@@ -249,18 +267,18 @@ export function QuizGenerationDialog({
 
     setError(null)
 
+    const timerSeconds = timerMs ? Math.floor(timerMs / 1000) : null
+
     const payload: any = {
+      topicId: topicId,
       title: finalQuizName,
       difficulty: difficulty,
-      quizType: quizType,
-      topicId: topicId,
-      userId: user.id,
       questionCount: questionCount,
-      topic: topicName,
+      model: selectedModel,
     }
 
-    if (timerMs !== null) {
-      payload.timer = timerMs
+    if (timerSeconds !== null) {
+      payload.timer = timerSeconds
     }
 
     try {
@@ -284,6 +302,7 @@ export function QuizGenerationDialog({
     setTimerOption("15")
     setCustomTimerMinutes("")
     setQuestionCount(15)
+    setSelectedModel("")
   }
 
   return (
@@ -452,6 +471,35 @@ export function QuizGenerationDialog({
               </div>
             </div>
 
+            {subscription?.allowedModels && subscription.allowedModels.length > 0 && (
+              <div className="space-y-2">
+                <label
+                  htmlFor="ai-model"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  AI Model
+                </label>
+                <Select
+                  value={selectedModel}
+                  onValueChange={setSelectedModel}
+                >
+                  <SelectTrigger id="ai-model">
+                    <SelectValue placeholder="Select AI model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subscription.allowedModels.map((model) => (
+                      <SelectItem key={model} value={model}>
+                        {model}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500">
+                  Available models based on your subscription plan
+                </p>
+              </div>
+            )}
+
             {/* Timer */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
@@ -527,9 +575,24 @@ export function QuizGenerationDialog({
                 className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
+            {usage && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">
+                    Quizzes: {usage.quizzesCount} / {subscription?.maxQuizzes || 0}
+                  </span>
+                  {usage.quizzesRemaining <= 0 && (
+                    <span className="flex items-center gap-1 text-sm text-orange-600">
+                      <AlertCircle className="h-4 w-4" />
+                      Limit reached
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3">
               <p className="text-sm text-red-600">{error}</p>

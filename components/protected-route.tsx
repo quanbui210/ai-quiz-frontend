@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 
@@ -10,13 +10,19 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, isAdmin } = useAuth()
+  const hasRedirectedRef = useRef(false)
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login")
+    if (!isLoading && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true
+      if (!isAuthenticated) {
+        router.push("/login")
+      } else if (isAdmin) {
+        router.push("/admin/dashboard")
+      }
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, isAdmin, router])
 
   if (isLoading) {
     return (
@@ -29,7 +35,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     )
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || isAdmin) {
     return null
   }
 
