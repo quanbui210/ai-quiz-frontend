@@ -9,7 +9,6 @@ export const apiClient = axios.create({
   },
 })
 
-// Helper to get auth token from localStorage
 const getAuthToken = (): string | null => {
   if (typeof window === "undefined") return null
   const authData = localStorage.getItem("auth-storage")
@@ -22,7 +21,6 @@ const getAuthToken = (): string | null => {
   }
 }
 
-// Request interceptor for adding auth tokens
 apiClient.interceptors.request.use(
   (config) => {
     const token = getAuthToken()

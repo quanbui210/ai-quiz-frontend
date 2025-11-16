@@ -10,9 +10,7 @@ export const fetcher = async <T = any>(url: string): Promise<T> => {
   return response.data
 }
 
-/**
- * SWR fetcher with custom config
- */
+
 export const fetcherWithConfig = async <T = any>(
   url: string,
   config?: any

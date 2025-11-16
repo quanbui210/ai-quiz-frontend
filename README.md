@@ -1,145 +1,148 @@
 # Quiz Next.js Frontend
 
-A modern, production-ready Next.js application built with TypeScript, shadcn/ui, Zustand, and SWR.
+A full-stack quiz application built with Next.js 14, TypeScript, and modern React patterns. Features AI-powered quiz generation, real-time progress tracking, and a pause/resume system for quiz attempts.
 
 ## Tech Stack
 
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type safety
-- **shadcn/ui** - Beautiful UI components
-- **Zustand** - Lightweight state management
-- **SWR** - Data fetching and caching
-- **Tailwind CSS** - Utility-first CSS framework
-- **Axios** - HTTP client
+- **Next.js 14** (App Router) - Server-side rendering and routing
+- **TypeScript** - Type safety across the application
+- **React 18** - Component-based UI
+- **Zustand** - Global state management (auth, UI state)
+- **SWR** - Data fetching with caching and revalidation
+- **Axios** - HTTP client with interceptors
+- **Tailwind CSS** - Utility-first styling
+- **shadcn/ui** - Component library built on Radix UI
+- **Recharts** - Data visualization for analytics
+- **Playwright** - E2E testing
 
-## Getting Started
+## Core Features
 
-### Prerequisites
+### Quiz Generation
+- AI-powered topic suggestions via API
+- Real-time topic validation before quiz creation
+- Configurable difficulty levels (Beginner, Intermediate, Advanced)
+- Custom timer settings (5/10/15/30 minutes or no timer)
+- Multiple quiz types support
 
-- Node.js 18+ and npm/yarn/pnpm
+### Quiz Taking
+- Question-by-question navigation
+- Real-time countdown timer
+- **Pause/Resume functionality**: Save quiz state, resume later with preserved answers and elapsed time
+- Auto-save answers as user progresses
+- Progress indicator showing answered/total questions
 
-### Installation
+### Analytics Dashboard
+- Weekly comparison metrics (attempts, topics, progress)
+- Time range filters (7/30/90 days)
+- Line charts for progress visualization
+- Topic-specific statistics
+- Trend indicators (up/down) for weekly changes
 
-1. Install dependencies:
+### Topic Management
+- CRUD operations for topics
+- Inline editing with optimistic updates
+- Topic detail view with associated quizzes
+- Statistics per topic (attempts, average score, time spent)
 
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+### Authentication
+- Google OAuth integration
+- Session management with token refresh
+- Protected routes with middleware
+- Client-side auth state with Zustand
+
+## Architecture
+
+### State Management
+- **Zustand store** (`stores/use-auth-store.ts`) - Authentication state
+- **SWR hooks** (`hooks/use-api.ts`) - Server state with caching
+- **Custom mutation hook** (`hooks/use-mutation.ts`) - POST/PUT/DELETE operations
+
+### API Integration
+- Centralized endpoints in `lib/constants.ts`
+- Axios interceptors for auth token injection
+- Error handling with custom `APIError` class
+- Response normalization for varying API response formats
+
+### Component Structure
+```
+components/
+  ├── layout/          # MainLayout, Sidebar
+  ├── quiz/            # QuizGenerationDialog, quiz components
+  ├── topics/          # Topic-related components
+  └── ui/              # shadcn/ui components
 ```
 
-2. Set up environment variables:
+### Data Flow
+1. **GET requests**: `useAPI` hook → SWR → Axios → API
+2. **Mutations**: `useMutation` hook → Axios → API → Optimistic updates
+3. **Auth**: Zustand store → localStorage → API interceptors
 
-```bash
-# On Windows (PowerShell)
-Copy-Item .env.example .env
+## Key Technical Decisions
 
-# On Mac/Linux
-cp .env.example .env
-```
+### Pause/Resume Implementation
+- Quiz state stored on backend with `attemptId`
+- Frontend tracks `elapsedTime` and `timeSpent` separately
+- Resume endpoint returns saved answers and elapsed time
+- Timer resumes from saved elapsed time on quiz load
 
-3. The `.env` file is already configured with:
-   - `NEXT_PUBLIC_API_URL=http://localhost:3001/api` (your backend URL)
-   - Additional placeholders for future API keys and features
+### Data Fetching Strategy
+- SWR for GET requests (caching, revalidation, error retry)
+- Custom `useMutation` for mutations (loading states, error handling)
+- Response unwrapping handles different API response formats (`data`, `analytics`, direct response)
 
-   See `ENV_SETUP.md` for detailed environment variable documentation.
+### Error Handling
+- Custom `APIError` class with status codes
+- Centralized error handling in hooks
+- User-friendly error messages in UI
+- 401 handling redirects to login
 
-4. Run the development server:
+### Type Safety
+- TypeScript interfaces for all API responses
+- Prisma types for database models
+- Type-safe hooks with generics
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Pages & Routes
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+- `/login` - Landing page with OAuth
+- `/dashboard` - Analytics and overview
+- `/topics` - Topic list with CRUD
+- `/topics/[id]` - Topic detail with quiz list
+- `/quizzes/[id]` - Quiz taking interface
+- `/quizzes/[id]/results` - Quiz results review
 
-## Project Structure
+## Testing
 
-```
-├── app/                    # Next.js App Router
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Home page
-│   └── globals.css        # Global styles
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   └── providers.tsx     # App providers (SWR, etc.)
-├── lib/                   # Utility functions
-│   ├── api/              # API client and fetchers
-│   ├── utils.ts          # Utility functions
-│   └── swr-config.ts     # SWR configuration
-├── stores/                # Zustand stores
-│   └── use-app-store.ts  # App-wide state
-├── hooks/                 # Custom React hooks
-│   └── use-api.ts        # API hook with SWR
-└── types/                 # TypeScript type definitions
-    └── index.ts
-```
+- **Playwright E2E tests** - Quiz pause/resume, validation, creation flows
+- **Vitest** - Unit tests for utilities
+- **Testing Library** - Component tests
 
-## Features
+## API Endpoints Used
 
-- ✅ TypeScript for type safety
-- ✅ shadcn/ui components
-- ✅ Zustand for state management
-- ✅ SWR for data fetching
-- ✅ Axios with interceptors
-- ✅ Professional folder structure
-- ✅ Tailwind CSS with dark mode support
-- ✅ ESLint configuration
+- `GET /api/v1/auth/session` - Session validation
+- `GET /api/v1/auth/me` - User info
+- `GET /api/v1/topic` - List topics
+- `GET /api/v1/topic/:id` - Topic detail
+- `PUT /api/v1/topic/:id` - Update topic
+- `DELETE /api/v1/topic/:id` - Delete topic
+- `GET /api/v1/quiz/:id` - Get quiz
+- `POST /api/v1/quiz/:id/pause` - Pause quiz
+- `POST /api/v1/quiz/:id/resume` - Resume quiz
+- `POST /api/v1/quiz/:id/submit` - Submit quiz
+- `GET /api/v1/quiz/:id/results` - Get results
+- `GET /api/v1/results/analytics/me` - Analytics data
 
-## Available Scripts
+## Development Notes
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Type check without emitting
+- Uses Next.js App Router (not Pages Router)
+- Client components marked with `"use client"`
+- Protected routes handled client-side with `ProtectedRoute` component
+- OAuth callback handled via `/callback` page
+- Environment variables for API URL configuration
 
-## Adding shadcn/ui Components
+## Future Enhancements
 
-To add more shadcn/ui components:
+- AI Tutor chat interface
+- Document upload for quiz generation (RAG)
+- Advanced analytics and recommendations
+- Social features and sharing
 
-```bash
-npx shadcn-ui@latest add [component-name]
-```
-
-Example:
-
-```bash
-npx shadcn-ui@latest add card
-npx shadcn-ui@latest add input
-```
-
-## State Management
-
-Zustand stores are located in the `stores/` directory. Example usage:
-
-```typescript
-import { useAppStore } from "@/stores/use-app-store"
-
-function MyComponent() {
-  const { user, setUser } = useAppStore()
-  // ...
-}
-```
-
-## Data Fetching
-
-Use SWR hooks for data fetching:
-
-```typescript
-import { useAPI } from "@/hooks/use-api"
-
-function MyComponent() {
-  const { data, error, isLoading } = useAPI<User>("/users/me")
-  // ...
-}
-```
-
-## License
-
-ISC

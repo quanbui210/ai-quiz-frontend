@@ -20,7 +20,7 @@ const navigation = [
     icon: BookOpen,
   },
   {
-    name: "Quiz from Document",
+    name: "RAG-based Quizzes",
     href: "/quizzes/quiz-from-document",
     icon: FileText,
   },

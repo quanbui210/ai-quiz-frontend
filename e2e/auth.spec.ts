@@ -14,14 +14,10 @@ test.describe("Authentication Flow", () => {
     ).toBeVisible()
   })
 
-  // Note: Full OAuth flow test would require mocking Google OAuth
-  // This is a placeholder for when you want to test the full flow
+ 
   test.skip("should complete OAuth flow and redirect to dashboard", async ({
     page,
   }) => {
-    // This test would require:
-    // 1. Mocking Google OAuth
-    // 2. Mocking the callback
-    // 3. Verifying dashboard access
+ 
   })
 })
