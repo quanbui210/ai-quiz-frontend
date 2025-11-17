@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { MainLayout } from "@/components/layout/main-layout"
 import { Button } from "@/components/ui/button"
 import { useSubscription } from "@/hooks/use-subscription"
 import { CheckCircle2, Loader2 } from "lucide-react"
 
-export default function SubscriptionSuccessPage() {
+function SubscriptionSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
@@ -92,5 +92,21 @@ export default function SubscriptionSuccessPage() {
         </div>
       </div>
     </MainLayout>
+  )
+}
+
+export default function SubscriptionSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <MainLayout>
+          <div className="flex min-h-[400px] items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          </div>
+        </MainLayout>
+      }
+    >
+      <SubscriptionSuccessContent />
+    </Suspense>
   )
 }
