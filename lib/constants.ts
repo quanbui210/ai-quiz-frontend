@@ -45,8 +45,25 @@ export const API_ENDPOINTS = {
     USER_SUBSCRIPTION: (userId: string) => `/api/v1/admin/users/${userId}/subscription`,
     PLANS: "/api/v1/admin/plans",
   },
+  DOCUMENT: {
+    UPLOAD: "/api/v1/documents/upload",
+    LIST: "/api/v1/documents",
+    GET: (id: string) => `/api/v1/documents/${id}`,
+    DELETE: (id: string) => `/api/v1/documents/${id}`,
+    GENERATE_QUIZ: (id: string) => `/api/v1/documents/${id}/quiz`,
+    QUIZZES: (id: string) => `/api/v1/documents/${id}/quizzes`,
+    CHATS: (id: string) => `/api/v1/documents/${id}/chats`,
+  },
+  CHAT: {
+    SESSIONS: "/api/v1/chat/sessions",
+    SESSION: (id: string) => `/api/v1/chat/sessions/${id}`,
+    CREATE_SESSION: "/api/v1/chat/sessions",
+    MESSAGES: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/messages`,
+    SEND_MESSAGE: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/messages`,
+    DELETE_SESSION: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}`,
+  },
 } as const
 
 export const APP_CONFIG = {
-  APP_NAME: "LearnAI",
+  APP_NAME: "QuizzAI",
 } as const

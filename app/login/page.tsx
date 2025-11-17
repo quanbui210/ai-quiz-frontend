@@ -235,7 +235,7 @@ export default function LoginPage() {
                 Real stories from real learners
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                See how Quizzly is transforming lives and opening new opportunities
+                See how QuizzAI is transforming lives and opening new opportunities
               </p>
             </div>
 
@@ -299,7 +299,7 @@ export default function LoginPage() {
                 Ready to start learning?
               </h2>
               <p className="text-xl text-blue-100 mb-8">
-                Join thousands of learners already using Quizzly
+                Join thousands of learners already using QuizzAI
               </p>
               <Button
                 onClick={handleGoogleLogin}

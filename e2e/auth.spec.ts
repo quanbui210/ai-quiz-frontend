@@ -8,7 +8,7 @@ test.describe("Authentication Flow", () => {
 
   test("should display login page", async ({ page }) => {
     await page.goto("/login")
-    await expect(page.getByText("Welcome to LearnAI")).toBeVisible()
+    await expect(page.getByText("Welcome to QuizzAI")).toBeVisible()
     await expect(
       page.getByRole("button", { name: /sign in with google/i })
     ).toBeVisible()

@@ -6,8 +6,7 @@ import { MainLayout } from "@/components/layout/main-layout"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { usePlans, useSubscription, useSubscriptionActions } from "@/hooks/use-subscription"
-import { Check, Loader2, Zap, Crown, Sparkles, CheckCircle2, CreditCard, ExternalLink } from "lucide-react"
-import { AlertCircle } from "lucide-react"
+import { Check, Loader2, Zap, Crown, Sparkles, CheckCircle2, CreditCard, ExternalLink, Info } from "lucide-react"
 
 export default function SubscriptionPage() {
   const router = useRouter()
@@ -115,6 +114,13 @@ export default function SubscriptionPage() {
     return "border-gray-300"
   }
 
+  const formatLimit = (value: number) => {
+    if (value >= 9999) {
+      return "Unlimited"
+    }
+    return value.toLocaleString()
+  }
+
   return (
     <MainLayout>
       <div className="mx-auto max-w-6xl space-y-8 py-8">
@@ -166,36 +172,56 @@ export default function SubscriptionPage() {
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-sm text-gray-600">Topics</p>
                 <p className="mt-1 text-2xl font-bold text-gray-900">
-                  {usage.topicsCount} / {subscription.maxTopics}
+                  {usage.topicsCount} / {formatLimit(subscription.maxTopics)}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
-                  {usage.topicsRemaining} remaining
-                </p>
+                {subscription.maxTopics < 9999 && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {usage.topicsRemaining} remaining
+                  </p>
+                )}
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-sm text-gray-600">Quizzes</p>
                 <p className="mt-1 text-2xl font-bold text-gray-900">
-                  {usage.quizzesCount} / {subscription.maxQuizzes}
+                  {usage.quizzesCount} / {formatLimit(subscription.maxQuizzes)}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
-                  {usage.quizzesRemaining} remaining
-                </p>
+                {subscription.maxQuizzes < 9999 && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {usage.quizzesRemaining} remaining
+                  </p>
+                )}
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-sm text-gray-600">Documents</p>
                 <p className="mt-1 text-2xl font-bold text-gray-900">
-                  {usage.documentsCount} / {subscription.maxDocuments}
+                  {usage.documentsCount} / {formatLimit(subscription.maxDocuments)}
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
-                  {usage.documentsRemaining} remaining
-                </p>
+                {subscription.maxDocuments < 9999 && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {usage.documentsRemaining} remaining
+                  </p>
+                )}
               </div>
             </div>
             {subscription.status === "ACTIVE" && subscription.currentPeriodEnd && (
-              <p className="mt-4 text-sm text-gray-600">
-                Current period ends:{" "}
-                {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-              </p>
+              <div className="mt-4 space-y-2">
+                <p className="text-sm text-gray-600">
+                  Current period ends:{" "}
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                </p>
+                {subscription.cancelAtPeriodEnd && (
+                  <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                    <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+                    <p className="text-sm text-blue-800">
+                      Your subscription is set to cancel at the end of the current period on{" "}
+                      <span className="font-medium">
+                        {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                      </span>
+                      . You can reactivate it anytime before then.
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
             {subscription.stripeSubscriptionId && (
               <p className="mt-4 text-sm text-gray-500">
@@ -234,42 +260,36 @@ export default function SubscriptionPage() {
                     </div>
                   )}
                   {!Icon && <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>}
-                  {plan.price !== null && plan.price !== undefined && (
-                    <div className="mt-2">
-                      <span className="text-3xl font-bold text-gray-900">
-                        ${(plan.price / 100).toFixed(2)}
+                  <div className="mt-2">
+                    {plan.price && plan.price.amount > 0 ? (
+                      <span className="text-2xl font-bold text-gray-800">
+                        {plan.price.formatted || 
+                          `${plan.price.currency === 'eur' ? '€' : '$'}${(plan.price.amount / 100).toFixed(2)} / ${plan.price.interval === "month" ? "mo" : "yr"}`
+                        }
                       </span>
-                      {plan.interval && (
-                        <span className="ml-1 text-sm text-gray-600">
-                          /{plan.interval === "month" ? "mo" : "yr"}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {(!plan.price || plan.price === 0) && plan.isDefault && (
-                    <div className="mt-2">
-                      <span className="text-3xl font-bold text-gray-900">Free</span>
-                    </div>
-                  )}
+                    ) : (
+                      <span className="text-2xl font-bold text-gray-800">€0</span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mb-6 space-y-3">
                   <div className="flex items-center gap-2">
                     <Check className="h-5 w-5 text-green-600" />
                     <span className="text-sm text-gray-700">
-                      {plan.maxTopics} topics
+                      {formatLimit(plan.maxTopics)} topics
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="h-5 w-5 text-green-600" />
                     <span className="text-sm text-gray-700">
-                      {plan.maxQuizzes} quizzes
+                      {formatLimit(plan.maxQuizzes)} quizzes
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="h-5 w-5 text-green-600" />
                     <span className="text-sm text-gray-700">
-                      {plan.maxDocuments} documents
+                      {formatLimit(plan.maxDocuments)} documents
                     </span>
                   </div>
                   <div className="flex items-start gap-2">

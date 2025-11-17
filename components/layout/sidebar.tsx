@@ -66,7 +66,7 @@ export function Sidebar() {
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
           <span className="text-xl font-bold text-white">Q</span>
         </div>
-        <span className="text-xl font-semibold text-gray-900">Quizzly</span>
+        <span className="text-xl font-semibold text-gray-900">QuizzAI</span>
       </div>
 
       {/* Navigation */}

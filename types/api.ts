@@ -1,6 +1,6 @@
 // API request/response types
 
-import { User } from "./prisma"
+import { Quiz, User } from "./prisma"
 
 export interface AuthLoginInitResponse {
   url: string
@@ -159,9 +159,16 @@ export interface SubscriptionPlan {
   allowedModels: string[]
   createdAt: string
   updatedAt: string
-  price?: number | null
-  currency?: string | null
-  interval?: "month" | "year" | null
+  price?: {
+    id: string
+    amount: number
+    currency: string
+    formatted: string
+    interval: "month" | "year"
+    intervalCount: number
+    stripePriceId: string
+    stripeProductId: string | null
+  } | null
 }
 
 export interface Subscription {
@@ -330,5 +337,127 @@ export interface UpdateUserLimitsResponse {
     maxQuizzes: number
     maxDocuments: number
     allowedModels: string[]
+  }
+}
+
+export type DocumentStatus = "UPLOADING" | "PROCESSING" | "READY" | "ERROR"
+
+export interface Document {
+  id: string
+  userId: string
+  filename: string
+  filePath: string
+  fileSize: number
+  mimeType: string
+  status: DocumentStatus
+  vectorized: boolean
+  chunkCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DocumentUploadResponse {
+  message: string
+  document: Document
+}
+
+export interface DocumentsListResponse {
+  documents: Document[]
+}
+
+export interface DocumentGenerateQuizResponse {
+  message: string
+  quiz: {
+    id: string
+    topicId: string
+  }
+}
+
+export interface DocumentQuizzesResponse {
+  documentId: string
+  quizzes: Array<{
+    id: string
+    title: string
+    type: string
+    difficulty: string
+    createdAt: string | Date
+    count: number
+    status: string
+    topicId?: string | null
+    documentId?: string | null
+  }>
+  count: number
+}
+
+export interface DocumentChatsResponse {
+  documentId: string
+  sessions: Array<{
+    id: string
+    title: string | null
+    model: string
+    createdAt: string
+    updatedAt: string
+    _count?: {
+      messages: number
+    }
+  }>
+  count: number
+}
+
+export type ChatRole = "USER" | "ASSISTANT" | "SYSTEM"
+
+export interface ChatMessage {
+  id: string
+  sessionId: string
+  role: ChatRole
+  content: string
+  contextChunks?: Array<{
+    chunkIndex: number
+    chunkText: string
+  }>
+  tokenCount?: number
+  createdAt: string
+}
+
+export interface ChatSession {
+  id: string
+  userId: string
+  documentId: string | null
+  title: string | null
+  model: string
+  createdAt: string
+  updatedAt: string
+  messages?: ChatMessage[]
+}
+
+export interface ChatSessionsResponse {
+  sessions: ChatSession[]
+}
+
+export interface ChatSessionResponse {
+  message?: string
+  session: ChatSession
+}
+
+export interface ChatMessagesResponse {
+  messages: ChatMessage[]
+}
+
+export interface SendChatMessageRequest {
+  message: string
+}
+
+export interface SendChatMessageResponse {
+  message: string
+  contextUsed?: boolean
+  contextChunks?: Array<{
+    chunkIndex: number
+    text: string
+    similarity: number
+  }>
+  tokenUsage?: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
   }
 }

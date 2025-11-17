@@ -21,10 +21,11 @@ interface QuizResult {
     title: string
     difficulty: string
     type: string
-    topic: {
+    topic?: {
       id: string
       name: string
-    }
+    } | null
+    documentId?: string | null
   }
   score: number
   correctCount: number
@@ -118,7 +119,16 @@ export default function QuizResultsPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push(`/topics/${results.quiz.topic.id}`)}
+            onClick={() => {
+              // If quiz was generated from a document, go back to quiz-from-document page
+              if (results.quiz.documentId) {
+                router.replace("/quizzes/quiz-from-document")
+              } else if (results.quiz.topic?.id) {
+                router.replace(`/topics/${results.quiz.topic.id}`)
+              } else {
+                router.replace("/dashboard")
+              }
+            }}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>

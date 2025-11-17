@@ -68,7 +68,8 @@ export default function QuizPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [attemptId, setAttemptId] = useState<string | null>(null)
   const [isPaused, setIsPaused] = useState(false)
-  const [isCheckingResume, setIsCheckingResume] = useState(true)
+  // Only check for resume if quiz is not completed (set via useEffect after quiz loads)
+  const [isCheckingResume, setIsCheckingResume] = useState(false)
   const [pauseSuccessDialog, setPauseSuccessDialog] = useState(false)
   const [pauseSuccessData, setPauseSuccessData] = useState<{ answered: number; total: number } | null>(null)
   const [errorDialog, setErrorDialog] = useState(false)
@@ -78,10 +79,51 @@ export default function QuizPage() {
     quizId ? API_ENDPOINTS.QUIZ.GET(quizId) : null
   )
 
+  // Normalize quiz data and ensure questions have proper structure
   const quiz: QuizResponse | null = quizData
-    ? (quizData as any).quiz || (quizData as QuizResponse)
+    ? (() => {
+        const rawQuiz = (quizData as any).quiz || (quizData as QuizResponse)
+        if (!rawQuiz) return null
+        
+        // Ensure questions array exists and normalize options
+        if (rawQuiz.questions && Array.isArray(rawQuiz.questions)) {
+          rawQuiz.questions = rawQuiz.questions.map((q: any) => {
+            // Ensure options is always an array
+            let options = q.options
+            if (!Array.isArray(options)) {
+              // If options is a string, try to parse it as JSON
+              if (typeof options === 'string') {
+                try {
+                  options = JSON.parse(options)
+                } catch (e) {
+                  options = []
+                }
+              } else if (options && typeof options === 'object') {
+                // If it's an object, convert to array
+                options = Object.values(options)
+              } else {
+                options = []
+              }
+            }
+            return {
+              ...q,
+              options: Array.isArray(options) ? options : []
+            }
+          })
+        }
+        
+        return rawQuiz as QuizResponse
+      })()
     : null
   const error = quizError ? (quizError as Error).message : null
+
+  useEffect(() => {
+    if (quiz && quiz.status !== "COMPLETED" && !isCheckingResume) {
+      setIsCheckingResume(true)
+    } else if (quiz && quiz.status === "COMPLETED") {
+      setIsCheckingResume(false)
+    }
+  }, [quiz, isCheckingResume])
 
   const { mutate: pauseQuiz, isLoading: isPausing } = useMutation<PauseResponse>("post", {
     onSuccess: (data) => {
@@ -141,7 +183,7 @@ export default function QuizPage() {
   useEffect(() => {
     if (quiz) {
       if (quiz.status === "COMPLETED") {
-        router.push(`/quizzes/${quizId}/results`)
+        router.replace(`/quizzes/${quizId}/results`)
         return
       }
       if (!isCheckingResume && !isPaused && quiz.timer && !timeRemaining) {
@@ -450,29 +492,37 @@ export default function QuizPage() {
 
             {/* Answer Options */}
             <div className="space-y-3">
-              {currentQuestion.options?.map((option, index) => {
-                const isSelected = answers[currentQuestion.id] === option
-                return (
-                  <button
-                    key={index}
-                    onClick={() =>
-                      handleAnswerSelect(currentQuestion.id, option)
-                    }
-                    className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
-                      isSelected
-                        ? "border-blue-500 bg-blue-50 text-blue-900"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{option}</span>
-                      {isSelected && (
-                        <CheckCircle2 className="h-5 w-5 text-blue-600" />
-                      )}
-                    </div>
-                  </button>
-                )
-              })}
+              {Array.isArray(currentQuestion.options) && currentQuestion.options.length > 0 ? (
+                currentQuestion.options.map((option, index) => {
+                  const isSelected = answers[currentQuestion.id] === option
+                  return (
+                    <button
+                      key={index}
+                      onClick={() =>
+                        handleAnswerSelect(currentQuestion.id, option)
+                      }
+                      className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
+                        isSelected
+                          ? "border-blue-500 bg-blue-50 text-blue-900"
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{option}</span>
+                        {isSelected && (
+                          <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                        )}
+                      </div>
+                    </button>
+                  )
+                })
+              ) : (
+                <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                  <p className="text-sm text-yellow-800">
+                    No answer options available for this question.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
