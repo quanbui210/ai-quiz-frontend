@@ -20,7 +20,7 @@ export default function CallbackPage() {
       if (hasProcessedRef.current) return
       hasProcessedRef.current = true
       try {
-        const hash = window.location.hash.substring(1) 
+        const hash = window.location.hash.substring(1)
         const params = new URLSearchParams(hash)
 
         const accessToken = params.get("access_token")

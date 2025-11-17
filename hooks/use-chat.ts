@@ -61,7 +61,11 @@ export function useChatMessages(sessionId: string | null) {
 export function useCreateChatSession() {
   const { mutate, isLoading, error } = useMutation<ChatSessionResponse>("post")
 
-  const createSession = async (documentId?: string, title?: string, model?: string) => {
+  const createSession = async (
+    documentId?: string,
+    title?: string,
+    model?: string
+  ) => {
     const payload: any = {}
     if (documentId) payload.documentId = documentId
     if (title) payload.title = title
@@ -77,7 +81,8 @@ export function useCreateChatSession() {
 }
 
 export function useSendChatMessage() {
-  const { mutate, isLoading, error } = useMutation<SendChatMessageResponse>("post")
+  const { mutate, isLoading, error } =
+    useMutation<SendChatMessageResponse>("post")
 
   const sendMessage = async (sessionId: string, message: string) => {
     const payload: SendChatMessageRequest = { message }
@@ -90,4 +95,3 @@ export function useSendChatMessage() {
     error,
   }
 }
-

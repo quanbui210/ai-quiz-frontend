@@ -102,64 +102,66 @@ export function QuizGenerationDialog({
     }
   }, [])
 
-  const { mutate: createQuiz, isLoading: isCreatingQuiz } = useMutation<QuizCreateResponse>("post", {
-    onSuccess: (data) => {
-      onOpenChange(false)
+  const { mutate: createQuiz, isLoading: isCreatingQuiz } =
+    useMutation<QuizCreateResponse>("post", {
+      onSuccess: (data) => {
+        onOpenChange(false)
 
-      setTimeout(() => {
-        const quizId = data.quiz?.id || (data as any).id
-        if (quizId) {
-          router.push(`/quizzes/${quizId}`)
+        setTimeout(() => {
+          const quizId = data.quiz?.id || (data as any).id
+          if (quizId) {
+            router.push(`/quizzes/${quizId}`)
+          } else {
+            setError("Quiz created but ID not found in response")
+          }
+        }, 100)
+      },
+      onError: (error) => {
+        console.error("Create quiz error:", error)
+        setError(error.message || "Failed to create quiz")
+      },
+    })
+
+  const { mutate: suggestQuiz, isLoading: isSuggestingQuiz } =
+    useMutation<QuizSuggestResponse>("post", {
+      onSuccess: (data) => {
+        if (
+          data.topics.length === 1 &&
+          typeof data.topics[0] === "string" &&
+          data.topics[0].includes(",")
+        ) {
+          const topics = data.topics[0]
+            .split(",")
+            .map((topic: string) => topic.trim())
+            .filter((topic: string) => topic.length > 0)
+          setSuggestions(topics)
         } else {
-          setError("Quiz created but ID not found in response")
+          setSuggestions(data.topics)
         }
-      }, 100)
-    },
-    onError: (error) => {
-      console.error("Create quiz error:", error)
-      setError(error.message || "Failed to create quiz")
-    },
-  })
+      },
+      onError: (error) => {
+        console.error("Suggest quiz error:", error)
+        setError(error.message || "Failed to get suggestions")
+      },
+    })
 
-
-  const {mutate: suggestQuiz, isLoading: isSuggestingQuiz} = useMutation<QuizSuggestResponse>("post", {
-    onSuccess: (data) => {
-      if (
-        data.topics.length === 1 &&
-        typeof data.topics[0] === "string" &&
-        data.topics[0].includes(",")
-      ) {
-        const topics = data.topics[0]
-          .split(",")
-          .map((topic: string) => topic.trim())
-          .filter((topic: string) => topic.length > 0)
-        setSuggestions(topics)
-      } else {
-        setSuggestions(data.topics)
-      }
-    },
-    onError: (error) => {
-      console.error("Suggest quiz error:", error)
-      setError(error.message || "Failed to get suggestions")
-    },
-  })
-
-  const {mutate: validateQuiz, isLoading: isValidatingQuiz} = useMutation<QuizValidateResponse>("post", {
-    onSuccess: (data) => {
-      setValidationResult({
-        isValid: data.isValid,
-        message: data.message,
-      })
-      setIsValidating(false)
-    },
-    onError: (error) => {
-      setValidationResult({
-        isValid: false,
-        message: error.message || "Failed to validate quiz",
-      })
-      setIsValidating(false)
-    },
-  })
+  const { mutate: validateQuiz, isLoading: isValidatingQuiz } =
+    useMutation<QuizValidateResponse>("post", {
+      onSuccess: (data) => {
+        setValidationResult({
+          isValid: data.isValid,
+          message: data.message,
+        })
+        setIsValidating(false)
+      },
+      onError: (error) => {
+        setValidationResult({
+          isValid: false,
+          message: error.message || "Failed to validate quiz",
+        })
+        setIsValidating(false)
+      },
+    })
 
   const handleValidate = useCallback(
     async (input: string) => {
@@ -171,10 +173,9 @@ export function QuizGenerationDialog({
       setIsValidating(true)
 
       validateQuiz(API_ENDPOINTS.QUIZ.VALIDATE_TOPIC, {
-          method: "POST",
-          name: input.trim(),
-        })
-     
+        method: "POST",
+        name: input.trim(),
+      })
     },
     [validateQuiz]
   )
@@ -185,9 +186,12 @@ export function QuizGenerationDialog({
       setSelectedSuggestion("")
       setSuggestions([])
       setValidationResult(null)
-      setError(null) 
+      setError(null)
       setIsTypingManually(false)
-      if (subscription?.allowedModels && subscription.allowedModels.length > 0) {
+      if (
+        subscription?.allowedModels &&
+        subscription.allowedModels.length > 0
+      ) {
         setSelectedModel(subscription.allowedModels[0])
       }
       if (topicName.trim()) {
@@ -199,7 +203,6 @@ export function QuizGenerationDialog({
     }
   }, [open, topicName, subscription])
 
- 
   useEffect(() => {
     if (!isTypingManually || !quizName.trim()) {
       if (!quizName.trim()) {
@@ -210,7 +213,7 @@ export function QuizGenerationDialog({
 
     const timeoutId = setTimeout(() => {
       handleValidate(quizName.trim())
-    }, 500) 
+    }, 500)
 
     return () => clearTimeout(timeoutId)
   }, [quizName, isTypingManually])
@@ -254,7 +257,10 @@ export function QuizGenerationDialog({
       return
     }
 
-    if (!selectedModel || !subscription?.allowedModels.includes(selectedModel)) {
+    if (
+      !selectedModel ||
+      !subscription?.allowedModels.includes(selectedModel)
+    ) {
       setError("Please select a valid AI model")
       return
     }
@@ -471,34 +477,35 @@ export function QuizGenerationDialog({
               </div>
             </div>
 
-            {subscription?.allowedModels && subscription.allowedModels.length > 0 && (
-              <div className="space-y-2">
-                <label
-                  htmlFor="ai-model"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  AI Model
-                </label>
-                <Select
-                  value={selectedModel}
-                  onValueChange={setSelectedModel}
-                >
-                  <SelectTrigger id="ai-model">
-                    <SelectValue placeholder="Select AI model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subscription.allowedModels.map((model) => (
-                      <SelectItem key={model} value={model}>
-                        {model}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500">
-                  Available models based on your subscription plan
-                </p>
-              </div>
-            )}
+            {subscription?.allowedModels &&
+              subscription.allowedModels.length > 0 && (
+                <div className="space-y-2">
+                  <label
+                    htmlFor="ai-model"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    AI Model
+                  </label>
+                  <Select
+                    value={selectedModel}
+                    onValueChange={setSelectedModel}
+                  >
+                    <SelectTrigger id="ai-model">
+                      <SelectValue placeholder="Select AI model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subscription.allowedModels.map((model) => (
+                        <SelectItem key={model} value={model}>
+                          {model}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500">
+                    Available models based on your subscription plan
+                  </p>
+                </div>
+              )}
 
             {/* Timer */}
             <div className="space-y-2">
@@ -580,7 +587,8 @@ export function QuizGenerationDialog({
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">
-                    Quizzes: {usage.quizzesCount} / {subscription?.maxQuizzes || 0}
+                    Quizzes: {usage.quizzesCount} /{" "}
+                    {subscription?.maxQuizzes || 0}
                   </span>
                   {usage.quizzesRemaining <= 0 && (
                     <span className="flex items-center gap-1 text-sm text-orange-600">
@@ -601,7 +609,11 @@ export function QuizGenerationDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isCreatingQuiz}>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={isCreatingQuiz}
+          >
             Cancel
           </Button>
           <Button

@@ -6,7 +6,11 @@ import { MainLayout } from "@/components/layout/main-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/use-auth"
-import { useChatSession, useChatMessages, useSendChatMessage } from "@/hooks/use-chat"
+import {
+  useChatSession,
+  useChatMessages,
+  useSendChatMessage,
+} from "@/hooks/use-chat"
 import { useDocument } from "@/hooks/use-document"
 import { Loader2, Send, ArrowLeft, FileText, Bot, User } from "lucide-react"
 import { ChatMessage, ChatRole } from "@/types/api"
@@ -22,7 +26,11 @@ export default function ChatPage() {
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
   const { session, isLoading: isLoadingSession } = useChatSession(sessionId)
-  const { messages, isLoading: isLoadingMessages, refetch: refetchMessages } = useChatMessages(sessionId)
+  const {
+    messages,
+    isLoading: isLoadingMessages,
+    refetch: refetchMessages,
+  } = useChatMessages(sessionId)
   const { sendMessage, isLoading: isSending } = useSendChatMessage()
   const { document } = useDocument(session?.documentId || null)
 
@@ -54,7 +62,7 @@ export default function ChatPage() {
 
     try {
       const response = await sendMessage(sessionId, messageText)
-      
+
       if (response?.message) {
         const aiMessage: ChatMessage = {
           id: `ai-${Date.now()}`,
@@ -70,7 +78,9 @@ export default function ChatPage() {
     } catch (error) {
       console.error("Failed to send message:", error)
       // Remove the user message on error
-      setLocalMessages((prev) => prev.filter((msg) => msg.id !== userMessage.id))
+      setLocalMessages((prev) =>
+        prev.filter((msg) => msg.id !== userMessage.id)
+      )
       // Restore message input
       setMessage(messageText)
     }
@@ -154,9 +164,7 @@ export default function ChatPage() {
             </div>
           </div>
           {document && (
-            <div className="text-xs text-gray-500">
-              Model: {session.model}
-            </div>
+            <div className="text-xs text-gray-500">Model: {session.model}</div>
           )}
         </div>
 
@@ -205,9 +213,7 @@ export default function ChatPage() {
                     <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
                     <p
                       className={`mt-1 text-xs ${
-                        msg.role === "USER"
-                          ? "text-blue-100"
-                          : "text-gray-500"
+                        msg.role === "USER" ? "text-blue-100" : "text-gray-500"
                       }`}
                     >
                       {formatMessageTime(msg.createdAt)}
@@ -221,7 +227,7 @@ export default function ChatPage() {
                 </div>
               ))}
               {isSending && (
-                <div className="flex gap-4 justify-start">
+                <div className="flex justify-start gap-4">
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100">
                     <Bot className="h-5 w-5 text-blue-600" />
                   </div>
@@ -272,7 +278,8 @@ export default function ChatPage() {
           </div>
           {document && (
             <p className="mt-2 text-xs text-gray-500">
-              Powered by RAG technology - answers are based on your document content
+              Powered by RAG technology - answers are based on your document
+              content
             </p>
           )}
         </form>
@@ -280,4 +287,3 @@ export default function ChatPage() {
     </MainLayout>
   )
 }
-

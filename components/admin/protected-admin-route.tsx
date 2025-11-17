@@ -30,18 +30,17 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
           const parsed = JSON.parse(stored)
           const storedIsAdmin = parsed?.state?.isAdmin
           const storedIsAuthenticated = parsed?.state?.isAuthenticated
-          
+
           if (storedIsAuthenticated && storedIsAdmin && !isAuthenticated) {
             // Wait a bit for API to catch up
             return
           }
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }
 
     hasRedirectedRef.current = true
-    
+
     if (!isAuthenticated) {
       router.push("/admin/login")
     } else if (isAdmin === false) {
@@ -60,7 +59,6 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
     )
   }
 
-
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -70,7 +68,6 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
       </div>
     )
   }
-
 
   if (isAdmin === false) {
     return (
@@ -84,4 +81,3 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
 
   return <>{children}</>
 }
-

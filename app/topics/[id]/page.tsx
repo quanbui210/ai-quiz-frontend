@@ -45,16 +45,18 @@ export default function TopicPage() {
   const [editTopicName, setEditTopicName] = useState("")
   const [deleteTopicConfirm, setDeleteTopicConfirm] = useState(false)
 
-  const { data: topicData, isLoading, error: topicError, mutate: refetchTopic } = useAPI<Topic>(
-    topicId ? API_ENDPOINTS.TOPIC.GET(topicId) : null
-  )
+  const {
+    data: topicData,
+    isLoading,
+    error: topicError,
+    mutate: refetchTopic,
+  } = useAPI<Topic>(topicId ? API_ENDPOINTS.TOPIC.GET(topicId) : null)
 
   const topic = topicData || null
   const error = topicError ? (topicError as Error).message : null
 
-  const { mutate: updateTopic, isLoading: isUpdatingTopic } = useMutation<Topic>(
-    "put",
-    {
+  const { mutate: updateTopic, isLoading: isUpdatingTopic } =
+    useMutation<Topic>("put", {
       onSuccess: () => {
         setIsEditingTopic(false)
         setEditTopicName("")
@@ -63,8 +65,7 @@ export default function TopicPage() {
       onError: (error) => {
         alert(error.message || "Failed to update topic")
       },
-    }
-  )
+    })
 
   const { mutate: deleteTopic, isLoading: isDeletingTopic } = useMutation(
     "delete",
@@ -78,17 +79,17 @@ export default function TopicPage() {
     }
   )
 
-  const { data: quizzesData, isLoading: isLoadingQuizzesData } = useAPI<Quiz[] | { quizzes?: Quiz[] }>(
-    topicId ? API_ENDPOINTS.QUIZ.LIST_BY_TOPIC(topicId) : null
-  )
+  const { data: quizzesData, isLoading: isLoadingQuizzesData } = useAPI<
+    Quiz[] | { quizzes?: Quiz[] }
+  >(topicId ? API_ENDPOINTS.QUIZ.LIST_BY_TOPIC(topicId) : null)
 
-  const { data: analyticsData } = useAPI<AnalyticsResponse | { analytics?: AnalyticsResponse; data?: AnalyticsResponse }>(
-    API_ENDPOINTS.ANALYTICS.ME,
-    {
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-    }
-  )
+  const { data: analyticsData } = useAPI<
+    | AnalyticsResponse
+    | { analytics?: AnalyticsResponse; data?: AnalyticsResponse }
+  >(API_ENDPOINTS.ANALYTICS.ME, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  })
 
   const analytics: AnalyticsResponse | null = analyticsData
     ? (analyticsData as any).analytics ||
@@ -96,11 +97,14 @@ export default function TopicPage() {
       (analyticsData as AnalyticsResponse)
     : null
 
-  const topicStats = analytics?.topics?.find((t) => t.topicId === topicId) || null
+  const topicStats =
+    analytics?.topics?.find((t) => t.topicId === topicId) || null
 
   useEffect(() => {
     if (quizzesData) {
-      const quizzesList = Array.isArray(quizzesData) ? quizzesData : quizzesData.quizzes || []
+      const quizzesList = Array.isArray(quizzesData)
+        ? quizzesData
+        : quizzesData.quizzes || []
       setQuizzes(quizzesList)
       setIsLoadingQuizzes(false)
     } else if (isLoadingQuizzesData) {
@@ -153,7 +157,9 @@ export default function TopicPage() {
     {
       onSuccess: () => {
         if (deleteConfirm) {
-          setQuizzes((prev) => prev.filter((q) => q.id !== deleteConfirm.quizId))
+          setQuizzes((prev) =>
+            prev.filter((q) => q.id !== deleteConfirm.quizId)
+          )
           setDeleteConfirm(null)
         }
       },
@@ -334,7 +340,8 @@ export default function TopicPage() {
                       <div>
                         <p className="text-gray-600">Quizzes Completed</p>
                         <p className="font-semibold text-gray-900">
-                          {topicStats.completedQuizzes} / {topicStats.totalQuizzes}
+                          {topicStats.completedQuizzes} /{" "}
+                          {topicStats.totalQuizzes}
                         </p>
                       </div>
                       <div>

@@ -12,7 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ArrowLeft, Clock, CheckCircle2, Loader2, Pause, Play, CheckCircle, AlertCircle } from "lucide-react"
+import {
+  ArrowLeft,
+  Clock,
+  CheckCircle2,
+  Loader2,
+  Pause,
+  Play,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react"
 import { Quiz, Question } from "@/types/prisma"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { useAuth } from "@/hooks/use-auth"
@@ -71,11 +80,18 @@ export default function QuizPage() {
   // Only check for resume if quiz is not completed (set via useEffect after quiz loads)
   const [isCheckingResume, setIsCheckingResume] = useState(false)
   const [pauseSuccessDialog, setPauseSuccessDialog] = useState(false)
-  const [pauseSuccessData, setPauseSuccessData] = useState<{ answered: number; total: number } | null>(null)
+  const [pauseSuccessData, setPauseSuccessData] = useState<{
+    answered: number
+    total: number
+  } | null>(null)
   const [errorDialog, setErrorDialog] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>("")
 
-  const { data: quizData, isLoading, error: quizError } = useAPI<{ quiz?: QuizResponse } | QuizResponse>(
+  const {
+    data: quizData,
+    isLoading,
+    error: quizError,
+  } = useAPI<{ quiz?: QuizResponse } | QuizResponse>(
     quizId ? API_ENDPOINTS.QUIZ.GET(quizId) : null
   )
 
@@ -84,7 +100,7 @@ export default function QuizPage() {
     ? (() => {
         const rawQuiz = (quizData as any).quiz || (quizData as QuizResponse)
         if (!rawQuiz) return null
-        
+
         // Ensure questions array exists and normalize options
         if (rawQuiz.questions && Array.isArray(rawQuiz.questions)) {
           rawQuiz.questions = rawQuiz.questions.map((q: any) => {
@@ -92,13 +108,13 @@ export default function QuizPage() {
             let options = q.options
             if (!Array.isArray(options)) {
               // If options is a string, try to parse it as JSON
-              if (typeof options === 'string') {
+              if (typeof options === "string") {
                 try {
                   options = JSON.parse(options)
                 } catch (e) {
                   options = []
                 }
-              } else if (options && typeof options === 'object') {
+              } else if (options && typeof options === "object") {
                 // If it's an object, convert to array
                 options = Object.values(options)
               } else {
@@ -107,11 +123,11 @@ export default function QuizPage() {
             }
             return {
               ...q,
-              options: Array.isArray(options) ? options : []
+              options: Array.isArray(options) ? options : [],
             }
           })
         }
-        
+
         return rawQuiz as QuizResponse
       })()
     : null
@@ -125,23 +141,28 @@ export default function QuizPage() {
     }
   }, [quiz, isCheckingResume])
 
-  const { mutate: pauseQuiz, isLoading: isPausing } = useMutation<PauseResponse>("post", {
-    onSuccess: (data) => {
-      setIsPaused(true)
-      setAttemptId(data.attemptId)
-      setPauseSuccessData({
-        answered: data.answeredQuestions,
-        total: data.totalQuestions,
-      })
-      setPauseSuccessDialog(true)
-    },
-    onError: (error) => {
-      setErrorMessage(error.message || "Failed to pause quiz")
-      setErrorDialog(true)
-    },
-  })
+  const { mutate: pauseQuiz, isLoading: isPausing } =
+    useMutation<PauseResponse>("post", {
+      onSuccess: (data) => {
+        setIsPaused(true)
+        setAttemptId(data.attemptId)
+        setPauseSuccessData({
+          answered: data.answeredQuestions,
+          total: data.totalQuestions,
+        })
+        setPauseSuccessDialog(true)
+      },
+      onError: (error) => {
+        setErrorMessage(error.message || "Failed to pause quiz")
+        setErrorDialog(true)
+      },
+    })
 
-  const { data: resumeData, isLoading: isLoadingResume, error: resumeError } = useAPI<ResumeResponse>(
+  const {
+    data: resumeData,
+    isLoading: isLoadingResume,
+    error: resumeError,
+  } = useAPI<ResumeResponse>(
     quizId && isCheckingResume ? API_ENDPOINTS.QUIZ.RESUME(quizId) : null
   )
 
@@ -193,20 +214,17 @@ export default function QuizPage() {
     }
   }, [quiz, quizId, router, isCheckingResume, isPaused, timeRemaining])
 
-  const { mutate: submitQuiz, isLoading: isSubmitting } = useMutation(
-    "post",
-    {
-      onSuccess: () => {
-        setTimeout(() => {
-          router.push(`/quizzes/${quizId}/results`)
-        }, 500)
-      },
-      onError: (error) => {
-        setErrorMessage(error.message || "Failed to submit quiz")
-        setErrorDialog(true)
-      },
-    }
-  )
+  const { mutate: submitQuiz, isLoading: isSubmitting } = useMutation("post", {
+    onSuccess: () => {
+      setTimeout(() => {
+        router.push(`/quizzes/${quizId}/results`)
+      }, 500)
+    },
+    onError: (error) => {
+      setErrorMessage(error.message || "Failed to submit quiz")
+      setErrorDialog(true)
+    },
+  })
 
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0 || isPaused) return
@@ -317,7 +335,9 @@ export default function QuizPage() {
   }
 
   if (isCheckingResume && resumeData && !isLoadingResume) {
-    const answeredCount = resumeData.questions.filter(q => q.savedAnswer).length
+    const answeredCount = resumeData.questions.filter(
+      (q) => q.savedAnswer
+    ).length
     return (
       <MainLayout>
         <div className="flex min-h-[400px] items-center justify-center">
@@ -328,7 +348,8 @@ export default function QuizPage() {
               </div>
               <h2 className="text-2xl font-bold text-gray-900">Resume Quiz</h2>
               <p className="mt-2 text-gray-600">
-                You have a paused quiz. Would you like to continue from where you left off?
+                You have a paused quiz. Would you like to continue from where
+                you left off?
               </p>
               <p className="mt-1 text-sm text-gray-500">
                 {answeredCount} questions answered
@@ -492,7 +513,8 @@ export default function QuizPage() {
 
             {/* Answer Options */}
             <div className="space-y-3">
-              {Array.isArray(currentQuestion.options) && currentQuestion.options.length > 0 ? (
+              {Array.isArray(currentQuestion.options) &&
+              currentQuestion.options.length > 0 ? (
                 currentQuestion.options.map((option, index) => {
                   const isSelected = answers[currentQuestion.id] === option
                   return (
@@ -603,9 +625,9 @@ export default function QuizPage() {
             <DialogDescription className="pt-2">
               {pauseSuccessData && (
                 <>
-                  You've answered <strong>{pauseSuccessData.answered}</strong> out of{" "}
-                  <strong>{pauseSuccessData.total}</strong> questions. You can resume later from
-                  where you left off.
+                  You've answered <strong>{pauseSuccessData.answered}</strong>{" "}
+                  out of <strong>{pauseSuccessData.total}</strong> questions.
+                  You can resume later from where you left off.
                 </>
               )}
             </DialogDescription>
@@ -626,7 +648,9 @@ export default function QuizPage() {
               </div>
               <DialogTitle className="text-red-900">Error</DialogTitle>
             </div>
-            <DialogDescription className="pt-2">{errorMessage}</DialogDescription>
+            <DialogDescription className="pt-2">
+              {errorMessage}
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button onClick={() => setErrorDialog(false)}>OK</Button>

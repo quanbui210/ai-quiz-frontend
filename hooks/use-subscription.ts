@@ -50,19 +50,23 @@ export function useSubscriptionActions(refetch?: () => void) {
       },
     })
 
-  const { mutate: cancelSubscription, isLoading: isCanceling } =
-    useMutation("post", {
+  const { mutate: cancelSubscription, isLoading: isCanceling } = useMutation(
+    "post",
+    {
       onError: (error) => {
         console.error("Failed to cancel subscription:", error)
       },
-    })
+    }
+  )
 
-  const { mutate: resumeSubscription, isLoading: isResuming } =
-    useMutation("post", {
+  const { mutate: resumeSubscription, isLoading: isResuming } = useMutation(
+    "post",
+    {
       onError: (error) => {
         console.error("Failed to resume subscription:", error)
       },
-    })
+    }
+  )
 
   const getPortalUrl = async () => {
     try {
@@ -76,24 +80,26 @@ export function useSubscriptionActions(refetch?: () => void) {
     }
   }
 
-  const handleCreateCheckout = async (planId: string): Promise<CheckoutResponse> => {
+  const handleCreateCheckout = async (
+    planId: string
+  ): Promise<CheckoutResponse> => {
     try {
       const response = await createCheckout(
         API_ENDPOINTS.SUBSCRIPTION.CREATE_CHECKOUT,
         { planId }
       )
-      
+
       if (response?.updated) {
         if (refetch) {
           await refetch()
         }
         return response
       }
-      
+
       if (response?.checkoutUrl) {
         window.location.href = response.checkoutUrl
       }
-      
+
       return response
     } catch (error) {
       throw error
@@ -138,4 +144,3 @@ export function useSubscriptionActions(refetch?: () => void) {
     isGettingPortal: false,
   }
 }
-

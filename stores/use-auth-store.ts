@@ -36,7 +36,13 @@ interface AuthState {
   } | null
 
   setAuth: (data: AuthLoginResponse | AuthSessionResponse) => void
-  setUser: (user: SupabaseUser | null, adminData?: { isAdmin?: boolean; admin?: { role: string; permissions: string[] } | null }) => void
+  setUser: (
+    user: SupabaseUser | null,
+    adminData?: {
+      isAdmin?: boolean
+      admin?: { role: string; permissions: string[] } | null
+    }
+  ) => void
   setSession: (session: Session | null) => void
   logout: () => void
   setLoading: (loading: boolean) => void
@@ -59,8 +65,10 @@ export const useAuthStore = create<AuthState>()(
           const session = data.session
           const currentState = get()
 
-          const isAdmin = data.isAdmin !== undefined ? data.isAdmin : currentState.isAdmin
-          const admin = data.admin !== undefined ? data.admin : currentState.admin
+          const isAdmin =
+            data.isAdmin !== undefined ? data.isAdmin : currentState.isAdmin
+          const admin =
+            data.admin !== undefined ? data.admin : currentState.admin
 
           set({
             user,
@@ -71,7 +79,13 @@ export const useAuthStore = create<AuthState>()(
           })
         },
 
-        setUser: (user: SupabaseUser | null, adminData?: { isAdmin?: boolean; admin?: { role: string; permissions: string[] } | null }) => {
+        setUser: (
+          user: SupabaseUser | null,
+          adminData?: {
+            isAdmin?: boolean
+            admin?: { role: string; permissions: string[] } | null
+          }
+        ) => {
           const currentState = get()
           set({
             user,

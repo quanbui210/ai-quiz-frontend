@@ -2,12 +2,31 @@
 
 import { useState, useRef, useEffect } from "react"
 import { MainLayout } from "@/components/layout/main-layout"
-import { FileText, Upload, Loader2, CheckCircle2, X, MessageSquare, BookOpen, AlertCircle } from "lucide-react"
+import {
+  FileText,
+  Upload,
+  Loader2,
+  CheckCircle2,
+  X,
+  MessageSquare,
+  BookOpen,
+  AlertCircle,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { useDocuments, useDocumentUpload, useDocument, useDocumentDelete } from "@/hooks/use-document"
+import {
+  useDocuments,
+  useDocumentUpload,
+  useDocument,
+  useDocumentDelete,
+} from "@/hooks/use-document"
 import { useCreateChatSession } from "@/hooks/use-chat"
-import { Document, DocumentStatus, DocumentQuizzesResponse, DocumentChatsResponse } from "@/types/api"
+import {
+  Document,
+  DocumentStatus,
+  DocumentQuizzesResponse,
+  DocumentChatsResponse,
+} from "@/types/api"
 import { useAuth } from "@/hooks/use-auth"
 import { DocumentQuizGenerationDialog } from "@/components/document/document-quiz-generation-dialog"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -21,32 +40,51 @@ export default function QuizFromDocumentPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
+    null
+  )
   const [isDragging, setIsDragging] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
 
-  const { documents, isLoading: isLoadingDocuments, refetch: refetchDocuments } = useDocuments()
+  const {
+    documents,
+    isLoading: isLoadingDocuments,
+    refetch: refetchDocuments,
+  } = useDocuments()
   const { uploadDocument, isLoading: isUploading } = useDocumentUpload()
-  const { document: uploadedDocument, refetch: refetchDocument } = useDocument(selectedDocumentId)
+  const { document: uploadedDocument, refetch: refetchDocument } =
+    useDocument(selectedDocumentId)
   const { createSession, isLoading: isCreatingSession } = useCreateChatSession()
   const { deleteDocument, isLoading: isDeleting } = useDocumentDelete()
   const { subscription, usage } = useSubscription()
   const [isQuizDialogOpen, setIsQuizDialogOpen] = useState(false)
-  
-  const { data: quizzesData, isLoading: isLoadingQuizzes, mutate: refetchQuizzes } = useAPI<DocumentQuizzesResponse>(
-    selectedDocumentId ? API_ENDPOINTS.DOCUMENT.QUIZZES(selectedDocumentId) : null,
+
+  const {
+    data: quizzesData,
+    isLoading: isLoadingQuizzes,
+    mutate: refetchQuizzes,
+  } = useAPI<DocumentQuizzesResponse>(
+    selectedDocumentId
+      ? API_ENDPOINTS.DOCUMENT.QUIZZES(selectedDocumentId)
+      : null,
     {
       revalidateOnFocus: false,
     }
   )
-  
-  const { data: chatsData, isLoading: isLoadingChats, mutate: refetchChats } = useAPI<DocumentChatsResponse>(
-    selectedDocumentId ? API_ENDPOINTS.DOCUMENT.CHATS(selectedDocumentId) : null,
+
+  const {
+    data: chatsData,
+    isLoading: isLoadingChats,
+    mutate: refetchChats,
+  } = useAPI<DocumentChatsResponse>(
+    selectedDocumentId
+      ? API_ENDPOINTS.DOCUMENT.CHATS(selectedDocumentId)
+      : null,
     {
       revalidateOnFocus: false,
     }
   )
-  
+
   const documentQuizzes = quizzesData?.quizzes || []
   const documentChats = chatsData?.sessions || []
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -56,13 +94,17 @@ export default function QuizFromDocumentPage() {
   } | null>(null)
 
   useEffect(() => {
-    if (!uploadedDocument || uploadedDocument.status === "READY" || uploadedDocument.status === "ERROR") {
+    if (
+      !uploadedDocument ||
+      uploadedDocument.status === "READY" ||
+      uploadedDocument.status === "ERROR"
+    ) {
       return
     }
 
     const interval = setInterval(() => {
       refetchDocument()
-    }, 2000) 
+    }, 2000)
 
     return () => clearInterval(interval)
   }, [uploadedDocument, refetchDocument])
@@ -95,7 +137,9 @@ export default function QuizFromDocumentPage() {
 
     // Validate each file
     for (const file of fileArray) {
-      const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf("."))
+      const fileExtension = file.name
+        .toLowerCase()
+        .substring(file.name.lastIndexOf("."))
       if (
         !allowedTypes.includes(file.type) &&
         !allowedExtensions.includes(fileExtension)
@@ -107,7 +151,9 @@ export default function QuizFromDocumentPage() {
       }
 
       if (file.size > 40 * 1024 * 1024) {
-        setUploadError(`"${file.name}" is too large. File size must be less than 40MB`)
+        setUploadError(
+          `"${file.name}" is too large. File size must be less than 40MB`
+        )
         return
       }
     }
@@ -189,7 +235,6 @@ export default function QuizFromDocumentPage() {
     }
   }
 
-
   const handleSelectDocument = (documentId: string) => {
     if (selectedDocumentId === documentId) {
       setSelectedDocumentId(null)
@@ -199,7 +244,11 @@ export default function QuizFromDocumentPage() {
     setUploadError(null)
   }
 
-  const handleDeleteClick = (documentId: string, filename: string, e?: React.MouseEvent) => {
+  const handleDeleteClick = (
+    documentId: string,
+    filename: string,
+    e?: React.MouseEvent
+  ) => {
     if (e) {
       e.stopPropagation() // Prevent selecting the document when clicking delete
     }
@@ -281,9 +330,15 @@ export default function QuizFromDocumentPage() {
     <MainLayout>
       <div className="mx-auto max-w-4xl space-y-8 py-8">
         <div className="text-center">
-          <h1 className="mb-4 text-4xl font-bold text-gray-900">Quiz from Document</h1>
+          <h1 className="mb-4 text-4xl font-bold text-gray-900">
+            Quiz from Document
+          </h1>
           <p className="text-gray-600">
-            Upload your documents (PDFs, text files, etc.) and automatically generate personalized quizzes based on the content. Our AI uses RAG (Retrieval-Augmented Generation) technology to analyze your document, extract key concepts, and create relevant questions to help you master the material.
+            Upload your documents (PDFs, text files, etc.) and automatically
+            generate personalized quizzes based on the content. Our AI uses RAG
+            (Retrieval-Augmented Generation) technology to analyze your
+            document, extract key concepts, and create relevant questions to
+            help you master the material.
           </p>
         </div>
 
@@ -321,16 +376,24 @@ export default function QuizFromDocumentPage() {
                 <Upload className="h-6 w-6 text-purple-600" />
               </div>
               <h3 className="mb-1 text-lg font-semibold text-gray-900">
-                {documents.length > 0 ? "Upload More Documents" : "Upload Document"}
+                {documents.length > 0
+                  ? "Upload More Documents"
+                  : "Upload Document"}
               </h3>
               <p className="mb-2 text-sm text-gray-600">
                 Drag and drop your files here, or click to browse
               </p>
               <p className="mb-3 text-xs text-gray-500">
                 Supported: PDF, Word, Text, Markdown • Max 40MB per file
-                {subscription && subscription.maxDocuments > 0 && subscription.maxDocuments < 9999 && (
-                  <> • {documents.length} / {subscription.maxDocuments} documents</>
-                )}
+                {subscription &&
+                  subscription.maxDocuments > 0 &&
+                  subscription.maxDocuments < 9999 && (
+                    <>
+                      {" "}
+                      • {documents.length} / {subscription.maxDocuments}{" "}
+                      documents
+                    </>
+                  )}
               </p>
               <Button
                 onClick={() => fileInputRef.current?.click()}
@@ -361,219 +424,242 @@ export default function QuizFromDocumentPage() {
           </div>
 
           {documents.length > 0 && (
-              <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h3 className="mb-4 text-lg font-semibold text-gray-900">Your Documents</h3>
-                {isLoadingDocuments ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                  </div>
-                ) : (
-                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                    {documents.map((doc) => (
-                      <div
-                        key={doc.id}
-                        className={`relative rounded-lg border-2 p-4 transition-all ${
-                          selectedDocumentId === doc.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100"
-                        }`}
+            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                Your Documents
+              </h3>
+              {isLoadingDocuments ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {documents.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className={`relative rounded-lg border-2 p-4 transition-all ${
+                        selectedDocumentId === doc.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      <button
+                        onClick={() => handleSelectDocument(doc.id)}
+                        className="w-full text-left"
                       >
-                        <button
-                          onClick={() => handleSelectDocument(doc.id)}
-                          className="w-full text-left"
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="rounded-lg bg-purple-100 p-2">
-                              <FileText className="h-5 w-5 text-purple-600" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="truncate text-sm font-medium text-gray-900">
-                                {doc.filename}
-                              </p>
-                              <p className="mt-1 text-xs text-gray-500">
-                                {(doc.fileSize / 1024).toFixed(2)} KB
-                              </p>
-                              <div className="mt-2 flex items-center gap-2">
-                                {getStatusIcon(doc.status)}
-                                <span className="text-xs text-gray-600">
-                                  {getStatusMessage(doc.status)}
-                                </span>
-                              </div>
+                        <div className="flex items-start gap-3">
+                          <div className="rounded-lg bg-purple-100 p-2">
+                            <FileText className="h-5 w-5 text-purple-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-gray-900">
+                              {doc.filename}
+                            </p>
+                            <p className="mt-1 text-xs text-gray-500">
+                              {(doc.fileSize / 1024).toFixed(2)} KB
+                            </p>
+                            <div className="mt-2 flex items-center gap-2">
+                              {getStatusIcon(doc.status)}
+                              <span className="text-xs text-gray-600">
+                                {getStatusMessage(doc.status)}
+                              </span>
                             </div>
                           </div>
-                        </button>
-                        <button
-                          onClick={(e) => handleDeleteClick(doc.id, doc.filename, e)}
-                          disabled={isDeleting}
-                          className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm transition-all hover:bg-red-600 hover:shadow disabled:opacity-50"
-                          title="Delete document"
-                        >
-                          {isDeleting ? (
-                            <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                          ) : (
-                            <X className="h-2.5 w-2.5" />
-                          )}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={(e) =>
+                          handleDeleteClick(doc.id, doc.filename, e)
+                        }
+                        disabled={isDeleting}
+                        className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm transition-all hover:bg-red-600 hover:shadow disabled:opacity-50"
+                        title="Delete document"
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                        ) : (
+                          <X className="h-2.5 w-2.5" />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {uploadedDocument && (
-              <>
-                {uploadedDocument.status === "READY" && (
-                  <>
-                    {/* Related Content Section - Combined Quizzes and Chat */}
-                    {(documentQuizzes.length > 0 || documentChats.length > 0) && (
-                      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <h3 className="mb-4 text-lg font-semibold text-gray-900">Related Content</h3>
-                        {(isLoadingQuizzes || isLoadingChats) ? (
-                          <div className="flex items-center justify-center py-4">
-                            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                          </div>
-                        ) : (
-                          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                            {/* Quizzes */}
-                            {documentQuizzes.map((quiz) => (
-                              <Link
-                                key={quiz.id}
-                                href={`/quizzes/${quiz.id}`}
-                                className="rounded-lg border-2 border-gray-200 bg-gray-50 p-4 transition-all hover:border-blue-300 hover:bg-blue-50"
-                              >
-                                <div className="flex items-start gap-3">
-                                  <div className="rounded-lg bg-blue-100 p-2">
-                                    <BookOpen className="h-5 w-5 text-blue-600" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="truncate text-sm font-medium text-gray-900">
-                                      {quiz.title}
-                                    </p>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                      {quiz.count} questions • {quiz.difficulty}
-                                    </p>
-                                    <p className="mt-1 text-xs text-gray-400">
-                                      {new Date(quiz.createdAt).toLocaleDateString()}
-                                    </p>
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                            
-                            {/* Chat Session */}
-                            {documentChats.map((chat) => (
-                              <Link
-                                key={chat.id}
-                                href={`/chat/${chat.id}`}
-                                className="rounded-lg border-2 border-purple-200 bg-purple-50 p-4 transition-all hover:border-purple-300 hover:bg-purple-100"
-                              >
-                                <div className="flex items-start gap-3">
-                                  <div className="rounded-lg bg-purple-100 p-2">
-                                    <MessageSquare className="h-5 w-5 text-purple-600" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="truncate text-sm font-medium text-gray-900">
-                                      {chat.title || "Untitled Chat"}
-                                    </p>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                      {chat._count?.messages || 0} messages
-                                    </p>
-                                    <p className="mt-1 text-xs text-gray-400">
-                                      {new Date(chat.updatedAt).toLocaleDateString()}
-                                    </p>
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Action Options */}
-                    <div className="grid gap-6 md:grid-cols-2">
-                      {/* Generate Quiz Option */}
-                      <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6">
-                        <div className="mb-4 flex items-center gap-3">
-                          <div className="rounded-lg bg-blue-100 p-3">
-                            <BookOpen className="h-6 w-6 text-blue-600" />
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900">Generate Quiz</h3>
-                        </div>
-                        <p className="mb-4 text-sm text-gray-600">
-                          Create a personalized quiz based on your document content. Our AI will analyze the document and generate relevant questions.
-                        </p>
-                        <Button
-                          onClick={handleGenerateQuiz}
-                          className="w-full"
-                          size="lg"
-                        >
-                          <BookOpen className="mr-2 h-4 w-4" />
-                          Generate Quiz
-                        </Button>
-                      </div>
-
-                      {/* Chat Option - Show existing chat or start new */}
-                      {documentChats.length > 0 ? (
-                        <div className="rounded-lg border-2 border-purple-200 bg-purple-50 p-6">
-                          <div className="mb-4 flex items-center gap-3">
-                            <div className="rounded-lg bg-purple-100 p-3">
-                              <MessageSquare className="h-6 w-6 text-purple-600" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900">Continue Chat</h3>
-                          </div>
-                          <p className="mb-4 text-sm text-gray-600">
-                            Continue your conversation with the AI tutor about this document.
-                          </p>
-                          <Link href={`/chat/${documentChats[0].id}`}>
-                            <Button
-                              className="w-full"
-                              size="lg"
-                              variant="outline"
-                            >
-                              <MessageSquare className="mr-2 h-4 w-4" />
-                              Open Chat ({documentChats[0]._count?.messages || 0} messages)
-                            </Button>
-                          </Link>
+            <>
+              {uploadedDocument.status === "READY" && (
+                <>
+                  {/* Related Content Section - Combined Quizzes and Chat */}
+                  {(documentQuizzes.length > 0 || documentChats.length > 0) && (
+                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                      <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                        Related Content
+                      </h3>
+                      {isLoadingQuizzes || isLoadingChats ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                         </div>
                       ) : (
-                        <div className="rounded-lg border-2 border-purple-200 bg-purple-50 p-6">
-                          <div className="mb-4 flex items-center gap-3">
-                            <div className="rounded-lg bg-purple-100 p-3">
-                              <MessageSquare className="h-6 w-6 text-purple-600" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900">Ask Questions</h3>
+                        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                          {/* Quizzes */}
+                          {documentQuizzes.map((quiz) => (
+                            <Link
+                              key={quiz.id}
+                              href={`/quizzes/${quiz.id}`}
+                              className="rounded-lg border-2 border-gray-200 bg-gray-50 p-4 transition-all hover:border-blue-300 hover:bg-blue-50"
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="rounded-lg bg-blue-100 p-2">
+                                  <BookOpen className="h-5 w-5 text-blue-600" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-medium text-gray-900">
+                                    {quiz.title}
+                                  </p>
+                                  <p className="mt-1 text-xs text-gray-500">
+                                    {quiz.count} questions • {quiz.difficulty}
+                                  </p>
+                                  <p className="mt-1 text-xs text-gray-400">
+                                    {new Date(
+                                      quiz.createdAt
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+
+                          {/* Chat Session */}
+                          {documentChats.map((chat) => (
+                            <Link
+                              key={chat.id}
+                              href={`/chat/${chat.id}`}
+                              className="rounded-lg border-2 border-purple-200 bg-purple-50 p-4 transition-all hover:border-purple-300 hover:bg-purple-100"
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="rounded-lg bg-purple-100 p-2">
+                                  <MessageSquare className="h-5 w-5 text-purple-600" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-sm font-medium text-gray-900">
+                                    {chat.title || "Untitled Chat"}
+                                  </p>
+                                  <p className="mt-1 text-xs text-gray-500">
+                                    {chat._count?.messages || 0} messages
+                                  </p>
+                                  <p className="mt-1 text-xs text-gray-400">
+                                    {new Date(
+                                      chat.updatedAt
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action Options */}
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {/* Generate Quiz Option */}
+                    <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6">
+                      <div className="mb-4 flex items-center gap-3">
+                        <div className="rounded-lg bg-blue-100 p-3">
+                          <BookOpen className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Generate Quiz
+                        </h3>
+                      </div>
+                      <p className="mb-4 text-sm text-gray-600">
+                        Create a personalized quiz based on your document
+                        content. Our AI will analyze the document and generate
+                        relevant questions.
+                      </p>
+                      <Button
+                        onClick={handleGenerateQuiz}
+                        className="w-full"
+                        size="lg"
+                      >
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        Generate Quiz
+                      </Button>
+                    </div>
+
+                    {/* Chat Option - Show existing chat or start new */}
+                    {documentChats.length > 0 ? (
+                      <div className="rounded-lg border-2 border-purple-200 bg-purple-50 p-6">
+                        <div className="mb-4 flex items-center gap-3">
+                          <div className="rounded-lg bg-purple-100 p-3">
+                            <MessageSquare className="h-6 w-6 text-purple-600" />
                           </div>
-                          <p className="mb-4 text-sm text-gray-600">
-                            Chat with our AI tutor about your document. Ask questions and get answers based on the document content using RAG technology.
-                          </p>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            Continue Chat
+                          </h3>
+                        </div>
+                        <p className="mb-4 text-sm text-gray-600">
+                          Continue your conversation with the AI tutor about
+                          this document.
+                        </p>
+                        <Link href={`/chat/${documentChats[0].id}`}>
                           <Button
-                            onClick={handleStartChat}
-                            disabled={isCreatingSession}
                             className="w-full"
                             size="lg"
                             variant="outline"
                           >
-                            {isCreatingSession ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Starting...
-                              </>
-                            ) : (
-                              <>
-                                <MessageSquare className="mr-2 h-4 w-4" />
-                                Start Chat
-                              </>
-                            )}
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            Open Chat ({documentChats[0]._count?.messages ||
+                              0}{" "}
+                            messages)
                           </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border-2 border-purple-200 bg-purple-50 p-6">
+                        <div className="mb-4 flex items-center gap-3">
+                          <div className="rounded-lg bg-purple-100 p-3">
+                            <MessageSquare className="h-6 w-6 text-purple-600" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            Ask Questions
+                          </h3>
                         </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
+                        <p className="mb-4 text-sm text-gray-600">
+                          Chat with our AI tutor about your document. Ask
+                          questions and get answers based on the document
+                          content using RAG technology.
+                        </p>
+                        <Button
+                          onClick={handleStartChat}
+                          disabled={isCreatingSession}
+                          className="w-full"
+                          size="lg"
+                          variant="outline"
+                        >
+                          {isCreatingSession ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Starting...
+                            </>
+                          ) : (
+                            <>
+                              <MessageSquare className="mr-2 h-4 w-4" />
+                              Start Chat
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
 
         {/* Quiz Generation Dialog */}

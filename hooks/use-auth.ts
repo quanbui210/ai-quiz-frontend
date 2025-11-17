@@ -46,7 +46,9 @@ export function useAuth() {
     mutate: refetchSession,
     error: sessionError,
   } = useAPI<AuthSessionResponse>(
-    hasHydrated && session && session.access_token ? API_ENDPOINTS.AUTH.SESSION : null,
+    hasHydrated && session && session.access_token
+      ? API_ENDPOINTS.AUTH.SESSION
+      : null,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
@@ -60,13 +62,18 @@ export function useAuth() {
     data: userData,
     mutate: refetchUser,
     error: userError,
-  } = useAPI<AuthMeResponse>(hasHydrated && session && session.access_token ? API_ENDPOINTS.AUTH.ME : null, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: true,
-    onErrorRetry: () => {},
-    errorRetryCount: 0,
-    shouldRetryOnError: false,
-  })
+  } = useAPI<AuthMeResponse>(
+    hasHydrated && session && session.access_token
+      ? API_ENDPOINTS.AUTH.ME
+      : null,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      onErrorRetry: () => {},
+      errorRetryCount: 0,
+      shouldRetryOnError: false,
+    }
+  )
 
   useEffect(() => {
     if (!session || !session.access_token) {
@@ -74,8 +81,13 @@ export function useAuth() {
     }
 
     const sessionIs401 =
-      sessionError && ((sessionError as any)?.response?.status === 401 || (sessionError as any)?.status === 401)
-    const userIs401 = userError && ((userError as any)?.response?.status === 401 || (userError as any)?.status === 401)
+      sessionError &&
+      ((sessionError as any)?.response?.status === 401 ||
+        (sessionError as any)?.status === 401)
+    const userIs401 =
+      userError &&
+      ((userError as any)?.response?.status === 401 ||
+        (userError as any)?.status === 401)
 
     if (sessionIs401 || userIs401) {
       clearAuth()

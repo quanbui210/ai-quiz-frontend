@@ -33,9 +33,12 @@ export default function TopicsPage() {
     topicName: string
   } | null>(null)
 
-  const { data: topicsData, isLoading, error: topicsError, mutate: refetchTopics } = useAPI<{ topics?: Topic[] } | Topic[]>(
-    API_ENDPOINTS.TOPIC.LIST
-  )
+  const {
+    data: topicsData,
+    isLoading,
+    error: topicsError,
+    mutate: refetchTopics,
+  } = useAPI<{ topics?: Topic[] } | Topic[]>(API_ENDPOINTS.TOPIC.LIST)
 
   const topics = topicsData
     ? Array.isArray(topicsData)
@@ -58,20 +61,17 @@ export default function TopicsPage() {
     }
   )
 
-  const { mutate: deleteTopic, isLoading: isDeleting } = useMutation(
-    "delete",
-    {
-      onSuccess: () => {
-        if (deleteConfirm) {
-          setDeleteConfirm(null)
-          refetchTopics()
-        }
-      },
-      onError: (error) => {
-        alert(error.message || "Failed to delete topic")
-      },
-    }
-  )
+  const { mutate: deleteTopic, isLoading: isDeleting } = useMutation("delete", {
+    onSuccess: () => {
+      if (deleteConfirm) {
+        setDeleteConfirm(null)
+        refetchTopics()
+      }
+    },
+    onError: (error) => {
+      alert(error.message || "Failed to delete topic")
+    },
+  })
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -179,10 +179,7 @@ export default function TopicsPage() {
                 key={topic.id}
                 className="relative rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-blue-500 hover:shadow-md"
               >
-                <Link
-                  href={`/topics/${topic.id}`}
-                  className="block space-y-3"
-                >
+                <Link href={`/topics/${topic.id}`} className="block space-y-3">
                   <div className="mb-3 flex items-start justify-between">
                     <BookOpen className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
                     <div className="flex items-center gap-2">

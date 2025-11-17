@@ -83,7 +83,6 @@ export function DocumentQuizGenerationDialog({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-
     if (formData.questionCount < 1 || formData.questionCount > 50) {
       newErrors.questionCount = "Question count must be between 1 and 50"
     }
@@ -140,14 +139,15 @@ export function DocumentQuizGenerationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-600" />
             Generate Quiz from Document
           </DialogTitle>
           <DialogDescription>
-            Configure your quiz settings. The quiz will be generated from "{documentFilename}".
+            Configure your quiz settings. The quiz will be generated from "
+            {documentFilename}".
           </DialogDescription>
         </DialogHeader>
 
@@ -178,7 +178,8 @@ export function DocumentQuizGenerationDialog({
               </select>
             )}
             <p className="text-xs text-gray-500">
-              Optionally attach this quiz to a topic. Leave empty for a standalone document quiz.
+              Optionally attach this quiz to a topic. Leave empty for a
+              standalone document quiz.
             </p>
             {errors.topicId && (
               <p className="text-sm text-red-600">{errors.topicId}</p>
@@ -318,4 +319,3 @@ export function DocumentQuizGenerationDialog({
     </Dialog>
   )
 }
-

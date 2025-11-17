@@ -5,15 +5,35 @@ import { useRouter } from "next/navigation"
 import { MainLayout } from "@/components/layout/main-layout"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
-import { usePlans, useSubscription, useSubscriptionActions } from "@/hooks/use-subscription"
-import { Check, Loader2, Zap, Crown, Sparkles, CheckCircle2, CreditCard, ExternalLink, Info } from "lucide-react"
+import {
+  usePlans,
+  useSubscription,
+  useSubscriptionActions,
+} from "@/hooks/use-subscription"
+import {
+  Check,
+  Loader2,
+  Zap,
+  Crown,
+  Sparkles,
+  CheckCircle2,
+  CreditCard,
+  ExternalLink,
+  Info,
+} from "lucide-react"
 
 export default function SubscriptionPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading: isAuthLoading, isAdmin } = useAuth()
   const { plans, isLoading: isLoadingPlans } = usePlans()
-  const { subscription, usage, isLoading: isLoadingSubscription, refetch } = useSubscription()
-  const { createCheckout, isCreatingCheckout, getPortal } = useSubscriptionActions(refetch)
+  const {
+    subscription,
+    usage,
+    isLoading: isLoadingSubscription,
+    refetch,
+  } = useSubscription()
+  const { createCheckout, isCreatingCheckout, getPortal } =
+    useSubscriptionActions(refetch)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isOpeningPortal, setIsOpeningPortal] = useState(false)
 
@@ -23,7 +43,11 @@ export default function SubscriptionPage() {
     if (isAdmin && !hasRedirectedRef.current) {
       hasRedirectedRef.current = true
       router.push("/admin/dashboard")
-    } else if (!isAuthLoading && !isAuthenticated && !hasRedirectedRef.current) {
+    } else if (
+      !isAuthLoading &&
+      !isAuthenticated &&
+      !hasRedirectedRef.current
+    ) {
       hasRedirectedRef.current = true
       router.push("/login")
     }
@@ -42,28 +66,30 @@ export default function SubscriptionPage() {
   const activePlans = plans.filter((plan) => plan.isActive && !plan.isCustom)
   const currentPlan = subscription?.plan
 
-  const getPlanButtonText = (plan: typeof activePlans[0]) => {
+  const getPlanButtonText = (plan: (typeof activePlans)[0]) => {
     if (subscription?.planId === plan.id) {
       return "Current Plan"
     }
-    
+
     if (!subscription?.stripeSubscriptionId) {
       return plan.stripePriceId ? "Subscribe" : "Contact Sales"
     }
-    
-    const currentPlanIndex = activePlans.findIndex((p) => p.id === subscription?.planId)
+
+    const currentPlanIndex = activePlans.findIndex(
+      (p) => p.id === subscription?.planId
+    )
     const targetPlanIndex = activePlans.findIndex((p) => p.id === plan.id)
-    
+
     if (currentPlanIndex === -1 || targetPlanIndex === -1) {
       return "Subscribe"
     }
-    
+
     if (targetPlanIndex > currentPlanIndex) {
       return "Upgrade"
     } else if (targetPlanIndex < currentPlanIndex) {
       return "Downgrade"
     }
-    
+
     return "Subscribe"
   }
 
@@ -74,13 +100,14 @@ export default function SubscriptionPage() {
     try {
       setSuccessMessage(null)
       const response = await createCheckout(planId)
-      
+
       if (response?.updated) {
         setSuccessMessage(
-          response.message || `Plan updated to ${response.planName || "Premium"}!`
+          response.message ||
+            `Plan updated to ${response.planName || "Premium"}!`
         )
         await refetch()
-        
+
         setTimeout(() => {
           setSuccessMessage(null)
         }, 5000)
@@ -125,7 +152,9 @@ export default function SubscriptionPage() {
     <MainLayout>
       <div className="mx-auto max-w-6xl space-y-8 py-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Subscription Plans</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Subscription Plans
+          </h1>
           <p className="mt-2 text-gray-600">
             Choose a plan that fits your learning needs
           </p>
@@ -135,7 +164,9 @@ export default function SubscriptionPage() {
           <div className="rounded-lg border border-green-200 bg-green-50 p-4">
             <div className="flex items-center gap-3">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <p className="text-sm font-medium text-green-800">{successMessage}</p>
+              <p className="text-sm font-medium text-green-800">
+                {successMessage}
+              </p>
             </div>
           </div>
         )}
@@ -194,7 +225,8 @@ export default function SubscriptionPage() {
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <p className="text-sm text-gray-600">Documents</p>
                 <p className="mt-1 text-2xl font-bold text-gray-900">
-                  {usage.documentsCount} / {formatLimit(subscription.maxDocuments)}
+                  {usage.documentsCount} /{" "}
+                  {formatLimit(subscription.maxDocuments)}
                 </p>
                 {subscription.maxDocuments < 9999 && (
                   <p className="mt-1 text-xs text-gray-500">
@@ -203,29 +235,36 @@ export default function SubscriptionPage() {
                 )}
               </div>
             </div>
-            {subscription.status === "ACTIVE" && subscription.currentPeriodEnd && (
-              <div className="mt-4 space-y-2">
-                <p className="text-sm text-gray-600">
-                  Current period ends:{" "}
-                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-                </p>
-                {subscription.cancelAtPeriodEnd && (
-                  <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                    <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-                    <p className="text-sm text-blue-800">
-                      Your subscription is set to cancel at the end of the current period on{" "}
-                      <span className="font-medium">
-                        {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
-                      </span>
-                      . You can reactivate it anytime before then.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
+            {subscription.status === "ACTIVE" &&
+              subscription.currentPeriodEnd && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm text-gray-600">
+                    Current period ends:{" "}
+                    {new Date(
+                      subscription.currentPeriodEnd
+                    ).toLocaleDateString()}
+                  </p>
+                  {subscription.cancelAtPeriodEnd && (
+                    <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                      <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+                      <p className="text-sm text-blue-800">
+                        Your subscription is set to cancel at the end of the
+                        current period on{" "}
+                        <span className="font-medium">
+                          {new Date(
+                            subscription.currentPeriodEnd
+                          ).toLocaleDateString()}
+                        </span>
+                        . You can reactivate it anytime before then.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             {subscription.stripeSubscriptionId && (
               <p className="mt-4 text-sm text-gray-500">
-                Click "Manage Subscription" to update payment methods, view invoices, or cancel your subscription in Stripe.
+                Click "Manage Subscription" to update payment methods, view
+                invoices, or cancel your subscription in Stripe.
               </p>
             )}
           </div>
@@ -256,19 +295,26 @@ export default function SubscriptionPage() {
                   {Icon && (
                     <div className="mb-2 flex items-center gap-2">
                       <Icon className="h-6 w-6 text-blue-600" />
-                      <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {plan.name}
+                      </h3>
                     </div>
                   )}
-                  {!Icon && <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>}
+                  {!Icon && (
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {plan.name}
+                    </h3>
+                  )}
                   <div className="mt-2">
                     {plan.price && plan.price.amount > 0 ? (
                       <span className="text-2xl font-bold text-gray-800">
-                        {plan.price.formatted || 
-                          `${plan.price.currency === 'eur' ? '€' : '$'}${(plan.price.amount / 100).toFixed(2)} / ${plan.price.interval === "month" ? "mo" : "yr"}`
-                        }
+                        {plan.price.formatted ||
+                          `${plan.price.currency === "eur" ? "€" : "$"}${(plan.price.amount / 100).toFixed(2)} / ${plan.price.interval === "month" ? "mo" : "yr"}`}
                       </span>
                     ) : (
-                      <span className="text-2xl font-bold text-gray-800">€0</span>
+                      <span className="text-2xl font-bold text-gray-800">
+                        €0
+                      </span>
                     )}
                   </div>
                 </div>
@@ -305,20 +351,22 @@ export default function SubscriptionPage() {
 
                 <Button
                   onClick={() => handleSubscribe(plan.id)}
-                  disabled={isCurrentPlan || isCreatingCheckout || !plan.stripePriceId}
+                  disabled={
+                    isCurrentPlan || isCreatingCheckout || !plan.stripePriceId
+                  }
                   className="w-full"
                   variant={isCurrentPlan ? "outline" : "default"}
                 >
-                  {isCurrentPlan
-                    ? "Current Plan"
-                    : isCreatingCheckout
-                    ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </>
-                      )
-                    : getPlanButtonText(plan)}
+                  {isCurrentPlan ? (
+                    "Current Plan"
+                  ) : isCreatingCheckout ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    getPlanButtonText(plan)
+                  )}
                 </Button>
               </div>
             )
@@ -328,4 +376,3 @@ export default function SubscriptionPage() {
     </MainLayout>
   )
 }
-

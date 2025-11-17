@@ -14,10 +14,7 @@ test.describe("Authentication Flow", () => {
     ).toBeVisible()
   })
 
- 
   test.skip("should complete OAuth flow and redirect to dashboard", async ({
     page,
-  }) => {
- 
-  })
+  }) => {})
 })

@@ -7,7 +7,6 @@ interface UseMutationOptions<T> {
   onError?: (error: Error) => void
 }
 
-
 export function useMutation<T = any>(
   method: "post" | "put" | "patch" | "delete",
   options?: UseMutationOptions<T>
@@ -15,7 +14,11 @@ export function useMutation<T = any>(
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
-  const mutate = async (url: string, data?: any) => {
+  const mutate = async (
+    url: string,
+    data?: any,
+    p0?: { headers: { "Content-Type": string } }
+  ) => {
     setIsLoading(true)
     setError(null)
 
@@ -25,15 +28,16 @@ export function useMutation<T = any>(
       return result
     } catch (err: any) {
       let error: Error
-      
+
       if (err.response) {
-        const message = err.response.data?.message || 
-                       err.response.data?.error || 
-                       err.message || 
-                       "An error occurred"
+        const message =
+          err.response.data?.message ||
+          err.response.data?.error ||
+          err.message ||
+          "An error occurred"
         const statusCode = err.response.status
         const data = err.response.data
-        
+
         error = new APIError(message, statusCode, data)
       } else if (err instanceof Error) {
         error = err

@@ -3,7 +3,15 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Wand2, Loader2, Check, X, Lightbulb, Zap, AlertCircle } from "lucide-react"
+import {
+  Wand2,
+  Loader2,
+  Check,
+  X,
+  Lightbulb,
+  Zap,
+  AlertCircle,
+} from "lucide-react"
 import { TopicSuggestResponse, TopicCreateResponse } from "@/types/api"
 import { API_ENDPOINTS } from "@/lib/constants"
 import { useMutation } from "@/hooks/use-mutation"
@@ -19,7 +27,11 @@ export function TopicSuggestionForm() {
 
   const { usage, subscription } = useSubscription()
 
-  const { mutate: createTopic, isLoading: isCreating, error: createError } = useMutation<TopicCreateResponse>("post", {
+  const {
+    mutate: createTopic,
+    isLoading: isCreating,
+    error: createError,
+  } = useMutation<TopicCreateResponse>("post", {
     onSuccess: (data) => {
       router.push(`/topics/${data.topic.id}`)
     },
@@ -27,7 +39,6 @@ export function TopicSuggestionForm() {
       setSuggestError(error.message || "Failed to create topic")
     },
   })
-
 
   const handleSelectSuggestion = (suggestion: string) => {
     setSelectedTopic(suggestion)
@@ -72,7 +83,6 @@ export function TopicSuggestionForm() {
 
   return (
     <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-     
       <div className="space-y-4">
         <div>
           <label

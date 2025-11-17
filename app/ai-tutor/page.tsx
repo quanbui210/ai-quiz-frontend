@@ -17,20 +17,16 @@ export default function AiTutorPage() {
               <MessageSquare className="h-16 w-16 text-blue-600" />
             </div>
           </div>
-          <h1 className="mb-4 text-4xl font-bold text-gray-900">
-            AI Tutor
-          </h1>
-          <p className="mb-2 text-xl text-gray-600">
-            Coming Soon
-          </p>
+          <h1 className="mb-4 text-4xl font-bold text-gray-900">AI Tutor</h1>
+          <p className="mb-2 text-xl text-gray-600">Coming Soon</p>
           <p className="mb-8 text-gray-500">
-            Our AI Tutor feature is currently under development. Soon you&apos;ll be able to chat with an intelligent tutor that can help you understand concepts, answer questions, and provide personalized learning guidance based on your quiz performance and learning goals.
+            Our AI Tutor feature is currently under development. Soon
+            you&apos;ll be able to chat with an intelligent tutor that can help
+            you understand concepts, answer questions, and provide personalized
+            learning guidance based on your quiz performance and learning goals.
           </p>
           <div className="flex justify-center gap-4">
-            <Button
-              variant="outline"
-              onClick={() => router.push("/dashboard")}
-            >
+            <Button variant="outline" onClick={() => router.push("/dashboard")}>
               Back to Dashboard
             </Button>
             <Button onClick={() => router.push("/topics")}>
@@ -42,4 +38,3 @@ export default function AiTutorPage() {
     </MainLayout>
   )
 }
-

@@ -42,7 +42,8 @@ export const API_ENDPOINTS = {
     USERS: "/api/v1/admin/users",
     USER: (userId: string) => `/api/v1/admin/users/${userId}`,
     USER_LIMITS: (userId: string) => `/api/v1/admin/users/${userId}/limits`,
-    USER_SUBSCRIPTION: (userId: string) => `/api/v1/admin/users/${userId}/subscription`,
+    USER_SUBSCRIPTION: (userId: string) =>
+      `/api/v1/admin/users/${userId}/subscription`,
     PLANS: "/api/v1/admin/plans",
   },
   DOCUMENT: {
@@ -58,8 +59,10 @@ export const API_ENDPOINTS = {
     SESSIONS: "/api/v1/chat/sessions",
     SESSION: (id: string) => `/api/v1/chat/sessions/${id}`,
     CREATE_SESSION: "/api/v1/chat/sessions",
-    MESSAGES: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/messages`,
-    SEND_MESSAGE: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}/messages`,
+    MESSAGES: (sessionId: string) =>
+      `/api/v1/chat/sessions/${sessionId}/messages`,
+    SEND_MESSAGE: (sessionId: string) =>
+      `/api/v1/chat/sessions/${sessionId}/messages`,
     DELETE_SESSION: (sessionId: string) => `/api/v1/chat/sessions/${sessionId}`,
   },
 } as const

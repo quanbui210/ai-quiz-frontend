@@ -18,7 +18,9 @@ export default function NewTopicPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Start New Topic</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Start New Topic
+            </h1>
             <p className="mt-1 text-gray-600">
               Tell us what you want to learn, and we&apos;ll create the perfect
               quiz for you

@@ -18,6 +18,7 @@ A full-stack quiz application built with Next.js 14, TypeScript, and modern Reac
 ## Core Features
 
 ### Quiz Generation
+
 - AI-powered topic suggestions via API
 - Real-time topic validation before quiz creation
 - Configurable difficulty levels (Beginner, Intermediate, Advanced)
@@ -25,6 +26,7 @@ A full-stack quiz application built with Next.js 14, TypeScript, and modern Reac
 - Multiple quiz types support
 
 ### Quiz Taking
+
 - Question-by-question navigation
 - Real-time countdown timer
 - **Pause/Resume functionality**: Save quiz state, resume later with preserved answers and elapsed time
@@ -32,6 +34,7 @@ A full-stack quiz application built with Next.js 14, TypeScript, and modern Reac
 - Progress indicator showing answered/total questions
 
 ### Analytics Dashboard
+
 - Weekly comparison metrics (attempts, topics, progress)
 - Time range filters (7/30/90 days)
 - Line charts for progress visualization
@@ -39,12 +42,14 @@ A full-stack quiz application built with Next.js 14, TypeScript, and modern Reac
 - Trend indicators (up/down) for weekly changes
 
 ### Topic Management
+
 - CRUD operations for topics
 - Inline editing with optimistic updates
 - Topic detail view with associated quizzes
 - Statistics per topic (attempts, average score, time spent)
 
 ### Authentication
+
 - Google OAuth integration
 - Session management with token refresh
 - Protected routes with middleware
@@ -53,17 +58,20 @@ A full-stack quiz application built with Next.js 14, TypeScript, and modern Reac
 ## Architecture
 
 ### State Management
+
 - **Zustand store** (`stores/use-auth-store.ts`) - Authentication state
 - **SWR hooks** (`hooks/use-api.ts`) - Server state with caching
 - **Custom mutation hook** (`hooks/use-mutation.ts`) - POST/PUT/DELETE operations
 
 ### API Integration
+
 - Centralized endpoints in `lib/constants.ts`
 - Axios interceptors for auth token injection
 - Error handling with custom `APIError` class
 - Response normalization for varying API response formats
 
 ### Component Structure
+
 ```
 components/
   ├── layout/          # MainLayout, Sidebar
@@ -73,6 +81,7 @@ components/
 ```
 
 ### Data Flow
+
 1. **GET requests**: `useAPI` hook → SWR → Axios → API
 2. **Mutations**: `useMutation` hook → Axios → API → Optimistic updates
 3. **Auth**: Zustand store → localStorage → API interceptors
@@ -80,23 +89,27 @@ components/
 ## Key Technical Decisions
 
 ### Pause/Resume Implementation
+
 - Quiz state stored on backend with `attemptId`
 - Frontend tracks `elapsedTime` and `timeSpent` separately
 - Resume endpoint returns saved answers and elapsed time
 - Timer resumes from saved elapsed time on quiz load
 
 ### Data Fetching Strategy
+
 - SWR for GET requests (caching, revalidation, error retry)
 - Custom `useMutation` for mutations (loading states, error handling)
 - Response unwrapping handles different API response formats (`data`, `analytics`, direct response)
 
 ### Error Handling
+
 - Custom `APIError` class with status codes
 - Centralized error handling in hooks
 - User-friendly error messages in UI
 - 401 handling redirects to login
 
 ### Type Safety
+
 - TypeScript interfaces for all API responses
 - Prisma types for database models
 - Type-safe hooks with generics
@@ -145,4 +158,3 @@ components/
 - Document upload for quiz generation (RAG)
 - Advanced analytics and recommendations
 - Social features and sharing
-

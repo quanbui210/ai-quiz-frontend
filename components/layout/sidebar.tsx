@@ -2,7 +2,17 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, BookOpen, Bot, FileText, Settings, LogOut, CreditCard, Crown, Zap } from "lucide-react"
+import {
+  LayoutDashboard,
+  BookOpen,
+  Bot,
+  FileText,
+  Settings,
+  LogOut,
+  CreditCard,
+  Crown,
+  Zap,
+} from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { useSubscription } from "@/hooks/use-subscription"
 import { Button } from "@/components/ui/button"
@@ -57,7 +67,9 @@ export function Sidebar() {
     return CreditCard
   }
 
-  const PlanIcon = subscription?.plan ? getPlanIcon(subscription.plan.name) : null
+  const PlanIcon = subscription?.plan
+    ? getPlanIcon(subscription.plan.name)
+    : null
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-gray-200 bg-white">
@@ -112,10 +124,13 @@ export function Sidebar() {
               <p className="truncate text-xs font-medium">
                 {subscription.plan.name}
               </p>
-              {subscription.plan.price !== null && subscription.plan.price !== undefined && subscription.plan.price > 0 ? (
+              {subscription.plan.price !== null &&
+              subscription.plan.price !== undefined &&
+              subscription.plan.price.amount > 0 ? (
                 <p className="truncate text-xs text-gray-500">
-                  ${(subscription.plan.price / 100).toFixed(2)}
-                  {subscription.plan.interval && `/${subscription.plan.interval === "month" ? "mo" : "yr"}`}
+                  ${(subscription.plan.price.amount / 100).toFixed(2)}
+                  {subscription.plan.price.interval &&
+                    `/${subscription.plan.price.interval === "month" ? "mo" : "yr"}`}
                 </p>
               ) : (
                 <p className="truncate text-xs text-gray-500">Free Plan</p>

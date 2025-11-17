@@ -25,7 +25,12 @@ export function useAdminDashboard(enabled: boolean = true) {
   }
 }
 
-export function useAdminUsers(page: number = 1, limit: number = 20, search?: string, enabled: boolean = true) {
+export function useAdminUsers(
+  page: number = 1,
+  limit: number = 20,
+  search?: string,
+  enabled: boolean = true
+) {
   const searchParams = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
@@ -96,7 +101,10 @@ export function useAdminActions() {
     }
   }
 
-  const handleUpdateUserSubscription = async (userId: string, planId: string) => {
+  const handleUpdateUserSubscription = async (
+    userId: string,
+    planId: string
+  ) => {
     try {
       const response = await updateUserSubscription(
         API_ENDPOINTS.ADMIN.USER_SUBSCRIPTION(userId),
@@ -115,4 +123,3 @@ export function useAdminActions() {
     isUpdatingSubscription,
   }
 }
-

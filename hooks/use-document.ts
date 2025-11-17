@@ -101,7 +101,8 @@ export function useDocumentDelete() {
 }
 
 export function useDocumentGenerateQuiz() {
-  const { mutate, isLoading, error } = useMutation<DocumentGenerateQuizResponse>("post")
+  const { mutate, isLoading, error } =
+    useMutation<DocumentGenerateQuizResponse>("post")
 
   const generateQuiz = async (documentId: string) => {
     return mutate(API_ENDPOINTS.DOCUMENT.GENERATE_QUIZ(documentId))

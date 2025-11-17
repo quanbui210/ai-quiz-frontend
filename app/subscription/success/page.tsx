@@ -49,8 +49,8 @@ export default function SubscriptionSuccessPage() {
             Subscription Successful!
           </h1>
           <p className="mb-8 text-lg text-gray-600">
-            Your subscription to <strong>{subscription?.plan.name}</strong> has been
-            activated successfully.
+            Your subscription to <strong>{subscription?.plan.name}</strong> has
+            been activated successfully.
           </p>
           <div className="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">
@@ -94,4 +94,3 @@ export default function SubscriptionSuccessPage() {
     </MainLayout>
   )
 }
-

@@ -96,7 +96,8 @@ export function EditUserLimitsDialog({
               onChange={(e) => setMaxTopics(parseInt(e.target.value) || 0)}
             />
             <p className="text-xs text-gray-500">
-              Current: {user?.subscription?.maxTopics || 0} • Used: {user?.usage.topicsCount || 0}
+              Current: {user?.subscription?.maxTopics || 0} • Used:{" "}
+              {user?.usage.topicsCount || 0}
             </p>
           </div>
 
@@ -110,7 +111,8 @@ export function EditUserLimitsDialog({
               onChange={(e) => setMaxQuizzes(parseInt(e.target.value) || 0)}
             />
             <p className="text-xs text-gray-500">
-              Current: {user?.subscription?.maxQuizzes || 0} • Used: {user?.usage.quizzesCount || 0}
+              Current: {user?.subscription?.maxQuizzes || 0} • Used:{" "}
+              {user?.usage.quizzesCount || 0}
             </p>
           </div>
 
@@ -124,7 +126,8 @@ export function EditUserLimitsDialog({
               onChange={(e) => setMaxDocuments(parseInt(e.target.value) || 0)}
             />
             <p className="text-xs text-gray-500">
-              Current: {user?.subscription?.maxDocuments ?? 0} • Used: {user?.usage.documentsCount ?? 0}
+              Current: {user?.subscription?.maxDocuments ?? 0} • Used:{" "}
+              {user?.usage.documentsCount ?? 0}
             </p>
           </div>
 
@@ -154,4 +157,3 @@ export function EditUserLimitsDialog({
     </Dialog>
   )
 }
-

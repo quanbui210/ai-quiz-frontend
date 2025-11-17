@@ -122,7 +122,9 @@ test.describe("Quiz Pause/Resume Feature", () => {
     await page.goto("/quizzes/quiz-123")
 
     await expect(page.getByText("Test Quiz")).toBeVisible()
-    await expect(page.getByText("What is the primary role of HTTP?")).toBeVisible()
+    await expect(
+      page.getByText("What is the primary role of HTTP?")
+    ).toBeVisible()
     await expect(page.getByRole("button", { name: /pause/i })).toBeVisible()
   })
 
@@ -253,10 +255,10 @@ test.describe("Quiz Pause/Resume Feature", () => {
 
     await page.goto("/quizzes/quiz-123")
     await page.waitForResponse("**/api/v1/quiz/quiz-123/resume")
-    await expect(page.getByRole("heading", { name: "Resume Quiz" })).toBeVisible()
     await expect(
-      page.getByText(/You have a paused quiz/i)
+      page.getByRole("heading", { name: "Resume Quiz" })
     ).toBeVisible()
+    await expect(page.getByText(/You have a paused quiz/i)).toBeVisible()
     await expect(page.getByText(/2 questions answered/i)).toBeVisible()
     await expect(
       page.getByRole("button", { name: /start fresh/i })
@@ -305,9 +307,7 @@ test.describe("Quiz Pause/Resume Feature", () => {
     await page.waitForResponse("**/api/v1/quiz/quiz-123/resume")
     await page.getByRole("button", { name: /resume quiz/i }).click()
     await page.waitForTimeout(500)
-    const firstAnswer = page
-      .locator('button:has-text("Protocol")')
-      .first()
+    const firstAnswer = page.locator('button:has-text("Protocol")').first()
     await expect(firstAnswer).toHaveClass(/border-blue-500|bg-blue-50/)
     await page.getByRole("button", { name: /next question/i }).click()
     await page.waitForTimeout(100)
@@ -315,11 +315,13 @@ test.describe("Quiz Pause/Resume Feature", () => {
       .locator('button:has-text("Representational State Transfer")')
       .first()
     await expect(secondAnswer).toHaveClass(/border-blue-500|bg-blue-50/)
-    const timer = page.locator('text=/\\d+:\\d+/').first()
+    const timer = page.locator("text=/\\d+:\\d+/").first()
     await expect(timer).toBeVisible()
   })
 
-  test("should start fresh when clicking Start Fresh button", async ({ page }) => {
+  test("should start fresh when clicking Start Fresh button", async ({
+    page,
+  }) => {
     await page.route("**/api/v1/quiz/quiz-123/resume", async (route) => {
       await route.fulfill({
         status: 200,
@@ -342,7 +344,7 @@ test.describe("Quiz Pause/Resume Feature", () => {
     await page.waitForTimeout(500)
     const firstAnswer = page.locator('button:has-text("Protocol")').first()
     await expect(firstAnswer).not.toHaveClass(/border-blue-500|bg-blue-50/)
-    const timer = page.locator('text=/\\d+:\\d+/').first()
+    const timer = page.locator("text=/\\d+:\\d+/").first()
     await expect(timer).toBeVisible()
   })
 
@@ -361,7 +363,9 @@ test.describe("Quiz Pause/Resume Feature", () => {
     await page.waitForResponse("**/api/v1/quiz/quiz-123/resume")
     await expect(page.getByText("Resume Quiz")).not.toBeVisible()
     await expect(page.getByText("Test Quiz")).toBeVisible()
-    await expect(page.getByText("What is the primary role of HTTP?")).toBeVisible()
+    await expect(
+      page.getByText("What is the primary role of HTTP?")
+    ).toBeVisible()
   })
 
   test("should include attemptId in submit when resuming", async ({ page }) => {
@@ -434,7 +438,7 @@ test.describe("Quiz Pause/Resume Feature", () => {
     await page.goto("/quizzes/quiz-123")
     await page.waitForTimeout(1000)
     const timerBefore = await page
-      .locator('text=/\\d+:\\d+/')
+      .locator("text=/\\d+:\\d+/")
       .first()
       .textContent()
     await page.waitForTimeout(2000)
@@ -442,7 +446,7 @@ test.describe("Quiz Pause/Resume Feature", () => {
     await page.waitForResponse("**/api/v1/quiz/quiz-123/pause")
     await page.waitForTimeout(2000)
     const timerAfter = await page
-      .locator('text=/\\d+:\\d+/')
+      .locator("text=/\\d+:\\d+/")
       .first()
       .textContent()
     expect(timerAfter).toBe(timerBefore)
@@ -641,7 +645,11 @@ test.describe("Quiz Generation and Validation", () => {
     await page.waitForTimeout(600)
 
     await page.waitForResponse("**/api/v1/quiz/validate-topic")
-    await expect(page.locator('svg[class*="text-green"], [data-testid="check-icon"]').first()).toBeVisible()
+    await expect(
+      page
+        .locator('svg[class*="text-green"], [data-testid="check-icon"]')
+        .first()
+    ).toBeVisible()
   })
 
   test("should create quiz successfully", async ({ page }) => {
@@ -919,4 +927,3 @@ test.describe("Quiz Generation and Validation", () => {
     expect(createRequest.title).toBe("HTTP Methods")
   })
 })
-

@@ -30,7 +30,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export default function LoginPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { login, handleCallback, isAuthenticated, isLoading, isAdmin } = useAuth()
+  const { login, handleCallback, isAuthenticated, isLoading, isAdmin } =
+    useAuth()
   const setLoading = useAuthStore((state) => state.setLoading)
 
   useEffect(() => {
@@ -43,14 +44,12 @@ export default function LoginPage() {
     } else if (code) {
       handleCallback(code)
     } else {
-    
       if (isLoading && !isAuthenticated) {
         const timer = setTimeout(() => {
-         
           if (window.location.pathname === "/login") {
             setLoading(false)
           }
-        }, 2000) 
+        }, 2000)
         return () => clearTimeout(timer)
       }
     }
@@ -110,7 +109,8 @@ export default function LoginPage() {
     {
       icon: MessageSquare,
       title: "AI Tutor",
-      description: "Get instant help and explanations from your AI learning assistant",
+      description:
+        "Get instant help and explanations from your AI learning assistant",
     },
     {
       icon: FileText,
@@ -126,50 +126,48 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="animate-blob absolute -right-40 -top-40 h-80 w-80 rounded-full bg-blue-200 opacity-30 mix-blend-multiply blur-xl filter"></div>
+        <div className="animate-blob animation-delay-2000 absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-purple-200 opacity-30 mix-blend-multiply blur-xl filter"></div>
+        <div className="animate-blob animation-delay-4000 absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-pink-200 opacity-30 mix-blend-multiply blur-xl filter"></div>
       </div>
 
       <div className="relative z-10">
         <section className="relative px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="text-center lg:text-left">
-                <div className="inline-flex items-center justify-center lg:justify-start mb-6">
+                <div className="mb-6 inline-flex items-center justify-center lg:justify-start">
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg">
                     <Sparkles className="h-8 w-8 text-white" />
                   </div>
                 </div>
-                <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
+                <h1 className="mb-6 text-5xl font-bold text-gray-900 sm:text-6xl">
                   Master Any Topic with
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                  <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     AI-Powered Quizzes
                   </span>
                 </h1>
-                <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
+                <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600 lg:mx-0">
                   Transform your learning experience with personalized quizzes,
                   instant feedback, and detailed progress tracking. Start your
                   journey to mastery today.
                 </p>
 
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-gray-100 max-w-md mx-auto lg:mx-0">
-                  <p className="text-sm font-medium text-gray-700 mb-4">
+                <div className="mx-auto max-w-md rounded-2xl border border-gray-100 bg-white/80 p-8 shadow-xl backdrop-blur-sm lg:mx-0">
+                  <p className="mb-4 text-sm font-medium text-gray-700">
                     Get started in seconds
                   </p>
                   <div className="space-y-3">
                     <Button
                       onClick={handleGoogleLogin}
                       disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
                       size="lg"
                     >
                       <Chrome className="mr-2 h-5 w-5" />
                       {isLoading ? "Signing in..." : "Sign in with Google"}
                     </Button>
-                 
-                  
                   </div>
                 </div>
               </div>
@@ -179,12 +177,12 @@ export default function LoginPage() {
                   {features.map((feature, index) => (
                     <div
                       key={index}
-                      className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                      className="rounded-xl border border-gray-100 bg-white/60 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 mb-4">
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500">
                         <feature.icon className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="font-semibold text-gray-900 mb-2">
+                      <h3 className="mb-2 font-semibold text-gray-900">
                         {feature.title}
                       </h3>
                       <p className="text-sm text-gray-600">
@@ -198,27 +196,27 @@ export default function LoginPage() {
           </div>
         </section>
 
-        <section className="px-4 py-20 sm:px-6 lg:px-8 bg-white/50">
+        <section className="bg-white/50 px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-4xl font-bold text-gray-900">
                 Everything you need to excel
               </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              <p className="mx-auto max-w-2xl text-xl text-gray-600">
                 Powerful features designed to accelerate your learning journey
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
+                  className="rounded-xl border border-gray-100 bg-white p-6 shadow-md transition-all duration-300 hover:shadow-xl"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 mb-4">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500">
                     <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">
+                  <h3 className="mb-2 text-lg font-semibold text-gray-900">
                     {feature.title}
                   </h3>
                   <p className="text-sm text-gray-600">{feature.description}</p>
@@ -228,32 +226,33 @@ export default function LoginPage() {
           </div>
         </section>
 
-        <section className="px-4 py-20 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
+        <section className="bg-gradient-to-br from-gray-50 to-blue-50 px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-4xl font-bold text-gray-900">
                 Real stories from real learners
               </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                See how QuizzAI is transforming lives and opening new opportunities
+              <p className="mx-auto max-w-2xl text-xl text-gray-600">
+                See how QuizzAI is transforming lives and opening new
+                opportunities
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid gap-8 md:grid-cols-2">
               {userStories.map((story) => {
                 const IconComponent = iconMap[story.icon] || BookOpen
                 return (
                   <div
                     key={story.id}
-                    className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+                    className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
                   >
                     <div
-                      className={`h-80 bg-gradient-to-br ${story.gradient} overflow-hidden relative flex items-center justify-center`}
+                      className={`h-80 bg-gradient-to-br ${story.gradient} relative flex items-center justify-center overflow-hidden`}
                     >
                       <img
                         src={story.image}
                         alt={story.imageAlt}
-                        className="w-full h-full object-contain"
+                        className="h-full w-full object-contain"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
                           target.style.display = "none"
@@ -276,11 +275,8 @@ export default function LoginPage() {
                       />
                     </div>
                     <div className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                   
-                       
-                      </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <div className="mb-3 flex items-center gap-2"></div>
+                      <p className="text-sm leading-relaxed text-gray-700">
                         "{story.story}"
                       </p>
                     </div>
@@ -294,17 +290,17 @@ export default function LoginPage() {
         {/* Final CTA */}
         <section className="px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center shadow-2xl">
-              <h2 className="text-4xl font-bold text-white mb-4">
+            <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-12 text-center shadow-2xl">
+              <h2 className="mb-4 text-4xl font-bold text-white">
                 Ready to start learning?
               </h2>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="mb-8 text-xl text-blue-100">
                 Join thousands of learners already using QuizzAI
               </p>
               <Button
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
-                className="bg-white text-blue-600 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-200"
+                className="bg-white text-blue-600 shadow-lg transition-all duration-200 hover:bg-gray-50 hover:shadow-xl"
                 size="lg"
               >
                 <Chrome className="mr-2 h-5 w-5" />

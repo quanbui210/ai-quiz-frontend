@@ -49,9 +49,13 @@ export default function QuizResultsPage() {
   const quizId = params.id as string
   const [results, setResults] = useState<QuizResult | null>(null)
 
-  const { data: resultsData, isLoading, error: resultsError } = useAPI<
-    { result?: QuizResult } | QuizResult
-  >(quizId ? API_ENDPOINTS.QUIZ.RESULTS(quizId) : null)
+  const {
+    data: resultsData,
+    isLoading,
+    error: resultsError,
+  } = useAPI<{ result?: QuizResult } | QuizResult>(
+    quizId ? API_ENDPOINTS.QUIZ.RESULTS(quizId) : null
+  )
 
   useEffect(() => {
     if (!resultsData) {

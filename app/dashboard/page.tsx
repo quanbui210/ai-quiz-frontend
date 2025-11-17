@@ -43,13 +43,17 @@ export default function DashboardPage() {
     }
   }, [isAdmin])
 
-  const { data: analyticsData, isLoading: isLoadingAnalytics, error: analyticsError } = useAPI<AnalyticsResponse | { analytics?: AnalyticsResponse; data?: AnalyticsResponse }>(
-    isAuthenticated ? API_ENDPOINTS.ANALYTICS.ME : null,
-    {
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-    }
-  )
+  const {
+    data: analyticsData,
+    isLoading: isLoadingAnalytics,
+    error: analyticsError,
+  } = useAPI<
+    | AnalyticsResponse
+    | { analytics?: AnalyticsResponse; data?: AnalyticsResponse }
+  >(isAuthenticated ? API_ENDPOINTS.ANALYTICS.ME : null, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  })
 
   const analytics: AnalyticsResponse | null = analyticsData
     ? (analyticsData as any).analytics ||
@@ -108,7 +112,9 @@ export default function DashboardPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Redirecting to admin dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Redirecting to admin dashboard...
+          </p>
         </div>
       </div>
     )
@@ -497,7 +503,11 @@ export default function DashboardPage() {
                         .sort((a, b) => {
                           // Sort by most recent: null lastAttemptAt (newly created) first,
                           // then by lastAttemptAt descending (most recent first)
-                          if (a.lastAttemptAt === null && b.lastAttemptAt === null) return 0
+                          if (
+                            a.lastAttemptAt === null &&
+                            b.lastAttemptAt === null
+                          )
+                            return 0
                           if (a.lastAttemptAt === null) return -1
                           if (b.lastAttemptAt === null) return 1
                           return (
@@ -507,45 +517,54 @@ export default function DashboardPage() {
                         })
                         .slice(0, 3)
                         .map((topic) => (
-                        <div
-                          key={topic.topicId}
-                          className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
-                        >
-                          <div className="flex-1">
-                            <div className="mb-2 flex items-center gap-2">
-                              <BookOpen className="h-4 w-4 text-blue-600" />
-                              <h3 className="font-medium text-gray-900">
-                                {topic.topicName}
-                              </h3>
+                          <div
+                            key={topic.topicId}
+                            className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
+                          >
+                            <div className="flex-1">
+                              <div className="mb-2 flex items-center gap-2">
+                                <BookOpen className="h-4 w-4 text-blue-600" />
+                                <h3 className="font-medium text-gray-900">
+                                  {topic.topicName}
+                                </h3>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm text-gray-600">
+                                <span>
+                                  {Math.round(topic.progressPercentage)}%
+                                  complete
+                                </span>
+                                <span>
+                                  {topic.completedQuizzes}/{topic.totalQuizzes}{" "}
+                                  quizzes
+                                </span>
+                                <span>
+                                  Avg: {Math.round(topic.averageScore)}%
+                                </span>
+                              </div>
+                              <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
+                                <div
+                                  className="h-2 rounded-full bg-blue-600"
+                                  style={{
+                                    width: `${topic.progressPercentage}%`,
+                                  }}
+                                ></div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                              <span>
-                                {Math.round(topic.progressPercentage)}% complete
-                              </span>
-                              <span>
-                                {topic.completedQuizzes}/{topic.totalQuizzes}{" "}
-                                quizzes
-                              </span>
-                              <span>Avg: {Math.round(topic.averageScore)}%</span>
-                            </div>
-                            <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
-                              <div
-                                className="h-2 rounded-full bg-blue-600"
-                                style={{ width: `${topic.progressPercentage}%` }}
-                              ></div>
-                            </div>
+                            <Link href={`/topics/${topic.topicId}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="ml-4"
+                              >
+                                {topic.progressPercentage === 100
+                                  ? "Review"
+                                  : topic.progressPercentage > 0
+                                    ? "Continue"
+                                    : "Start Quiz"}
+                              </Button>
+                            </Link>
                           </div>
-                          <Link href={`/topics/${topic.topicId}`}>
-                            <Button variant="outline" size="sm" className="ml-4">
-                              {topic.progressPercentage === 100
-                                ? "Review"
-                                : topic.progressPercentage > 0
-                                  ? "Continue"
-                                  : "Start Quiz"}
-                            </Button>
-                          </Link>
-                        </div>
-                      ))}
+                        ))}
                       {analytics.topics.length > 3 && (
                         <div className="pt-2">
                           <Link href="/topics">
