@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -46,19 +47,29 @@ export function Sidebar() {
   const pathname = usePathname()
   const { signOut } = useAuth()
   const { subscription } = useSubscription()
-  const storedUser = localStorage.getItem("auth-storage")
-  const parsedUser = storedUser ? JSON.parse(storedUser) : null
-  const userData = parsedUser?.state?.session?.user || null
+  const [displayName, setDisplayName] = useState("User")
+  const [displayAvatar, setDisplayAvatar] = useState<string | null>(null)
+  const [displayEmail, setDisplayEmail] = useState<string | null>(null)
 
-  const displayName =
-    userData?.user_metadata?.name ||
-    userData?.user_metadata?.full_name ||
-    "User"
-  const displayAvatar =
-    userData?.user_metadata?.avatar_url ||
-    userData?.user_metadata?.picture ||
-    null
-  const displayEmail = userData?.email || null
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("auth-storage")
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null
+      const userData = parsedUser?.state?.session?.user || null
+
+      setDisplayName(
+        userData?.user_metadata?.name ||
+          userData?.user_metadata?.full_name ||
+          "User"
+      )
+      setDisplayAvatar(
+        userData?.user_metadata?.avatar_url ||
+          userData?.user_metadata?.picture ||
+          null
+      )
+      setDisplayEmail(userData?.email || null)
+    }
+  }, [])
 
   const getPlanIcon = (planName: string) => {
     if (planName.toLowerCase().includes("free")) return null

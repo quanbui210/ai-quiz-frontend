@@ -92,6 +92,7 @@ export function QuizGenerationDialog({
   const [error, setError] = useState<string | null>(null)
 
   const getAuthToken = useCallback((): string | null => {
+    if (typeof window === "undefined") return null
     const authData = localStorage.getItem("auth-storage")
     if (!authData) return null
     try {
