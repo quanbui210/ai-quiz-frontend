@@ -135,7 +135,7 @@ function AdminDashboardContent() {
                       Total Revenue
                     </p>
                     <p className="mt-2 text-3xl font-bold text-gray-900">
-                      {stats?.revenue?.currency || "$"}
+                      { "$"}
                       {((stats?.revenue?.total || 0) / 100).toLocaleString(
                         "en-US",
                         {
@@ -145,7 +145,7 @@ function AdminDashboardContent() {
                       )}
                     </p>
                     <p className="mt-1 text-xs text-gray-500">
-                      Monthly: {stats?.revenue?.currency || "$"}
+                      Monthly: { "$"}
                       {((stats?.revenue?.monthly || 0) / 100).toLocaleString(
                         "en-US",
                         {

@@ -13,45 +13,54 @@ import {
 
 export function useAuth() {
   const router = useRouter()
-  const [hasHydrated, setHasHydrated] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("auth-storage")
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          if (parsed.state) {
-            return true
-          }
-        }
-      } catch (e) {
-      }
-    }
-    return true
-  })
   const {
     user,
     session,
     isAuthenticated,
-    isLoading,
+    isLoading: storeIsLoading,
     isAdmin,
     admin,
+    hasHydrated,
     setAuth,
     setUser,
     logout: clearAuth,
     setLoading,
   } = useAuthStore()
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && !hasHydrated) {
+      const checkHydration = setTimeout(() => {
+        const store = useAuthStore.getState()
+        if (!store.hasHydrated) {
+          try {
+            const stored = localStorage.getItem("auth-storage")
+            if (stored) {
+              const parsed = JSON.parse(stored)
+              if (parsed.state) {
+                store.setHasHydrated(true)
+              } else {
+                store.setHasHydrated(true)
+                store.setLoading(false)
+              }
+            } else {
+              store.setHasHydrated(true)
+              store.setLoading(false)
+            }
+          } catch (e) {
+            store.setHasHydrated(true)
+            store.setLoading(false)
+          }
+        }
+      }, 100)
+
+      return () => clearTimeout(checkHydration)
+    }
+  }, [hasHydrated])
+
   const sessionEndpoint = hasHydrated && session && session.access_token
     ? API_ENDPOINTS.AUTH.SESSION
     : null
 
-  useEffect(() => {
-    if (sessionEndpoint) {
-      console.log("Session endpoint enabled, will fetch:", sessionEndpoint)
-    } else {
-      console.log("Session endpoint disabled - hasHydrated:", hasHydrated, "hasSession:", !!session, "hasToken:", !!session?.access_token)
-    }
-  }, [sessionEndpoint])
 
   const {
     data: sessionData,
@@ -71,15 +80,6 @@ export function useAuth() {
     }
   )
 
-  // Log session endpoint errors
-  useEffect(() => {
-    if (sessionError) {
-      console.error("Session endpoint error:", sessionError)
-      if ((sessionError as any)?.response) {
-        console.error("Session error response:", (sessionError as any).response.status, (sessionError as any).response.data)
-      }
-    }
-  }, [sessionError])
 
   const {
     data: userData,
@@ -130,30 +130,33 @@ export function useAuth() {
   useEffect(() => {
     if (sessionData) {
       console.log("Session data received from endpoint:", sessionData)
-      // Validate session data structure
       if (!sessionData.user) {
         console.error("Session data missing user:", sessionData)
+        setLoading(false) 
         return
       }
       if (!sessionData.session) {
         console.error("Session data missing session:", sessionData)
+        setLoading(false) 
         return
       }
       if (!sessionData.session.access_token) {
         console.error("Session data missing access_token:", sessionData)
+        setLoading(false) // Stop loading even on error
         return
       }
       
-      // Check if this is different from current state
       const currentSession = session?.access_token
       const newSession = sessionData.session.access_token
       if (currentSession === newSession) {
         console.log("Session token unchanged, skipping update")
+        setLoading(false) //
         return
       }
       
       console.log("Setting auth from session endpoint - user:", sessionData.user?.id, "session:", !!sessionData.session?.access_token)
       setAuth(sessionData)
+      setLoading(false) // Session validated successfully
       
       // Force a re-render and verify storage
       setTimeout(() => {
@@ -179,10 +182,13 @@ export function useAuth() {
         }
       }, 200)
     } else if (sessionEndpoint && !isLoadingSession && !sessionError) {
-      // Session endpoint is enabled but no data yet
       console.log("Session endpoint enabled but no data received yet (loading:", isLoadingSession, "error:", !!sessionError, ")")
+    } else if (hasHydrated && sessionEndpoint && !isLoadingSession && sessionError) {
+      setLoading(false)
+    } else if (hasHydrated && !sessionEndpoint && !session) {
+      setLoading(false)
     }
-  }, [sessionData, setAuth, session, sessionEndpoint, isLoadingSession, sessionError])
+  }, [sessionData, setAuth, session, sessionEndpoint, isLoadingSession, sessionError, hasHydrated, setLoading])
 
   const login = useCallback(async () => {
     setLoading(true)
@@ -265,11 +271,13 @@ export function useAuth() {
     [setAuth, setLoading, router]
   )
 
+  const isLoading = !hasHydrated || storeIsLoading || isSigningOut || isLoadingSession
+
   return {
     user,
     session,
-    isAuthenticated,
-    isLoading: isLoading || isSigningOut,
+    isAuthenticated: hasHydrated ? isAuthenticated : false, // Don't trust auth state until hydrated
+    isLoading,
     isAdmin,
     admin,
     login,

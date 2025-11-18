@@ -34,6 +34,7 @@ interface AuthState {
     role: string
     permissions: string[]
   } | null
+  hasHydrated: boolean
 
   setAuth: (data: AuthLoginResponse | AuthSessionResponse) => void
   setUser: (
@@ -46,6 +47,7 @@ interface AuthState {
   setSession: (session: Session | null) => void
   logout: () => void
   setLoading: (loading: boolean) => void
+  setHasHydrated: (hydrated: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -55,12 +57,12 @@ export const useAuthStore = create<AuthState>()(
         user: null,
         session: null,
         isAuthenticated: false,
-        isLoading: false,
+        isLoading: true,
         isAdmin: false,
         admin: null,
+        hasHydrated: false,
 
         setAuth: (data: AuthLoginResponse | AuthSessionResponse) => {
-          // Backend returns user with Supabase structure (same ID as Prisma now)
           const user = data.user as SupabaseUser
           const session = data.session
           const currentState = get()
@@ -115,9 +117,29 @@ export const useAuthStore = create<AuthState>()(
         setLoading: (loading: boolean) => {
           set({ isLoading: loading })
         },
+
+        setHasHydrated: (hydrated: boolean) => {
+          set({ hasHydrated: hydrated })
+          // Once hydrated, set isLoading to false if no session exists
+          // If session exists, keep loading until API validates it
+          const state = get()
+          if (hydrated && !state.session) {
+            set({ isLoading: false })
+          }
+        },
       }),
       {
         name: "auth-storage",
+        onRehydrateStorage: () => (state) => {
+          // This callback runs after rehydration is complete
+          if (state) {
+            state.setHasHydrated(true)
+            // If no session after hydration, we're not authenticated
+            if (!state.session) {
+              state.setLoading(false)
+            }
+          }
+        },
       }
     ),
     {
