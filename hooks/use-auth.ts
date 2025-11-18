@@ -114,7 +114,7 @@ export function useAuth() {
     setLoading(true)
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL;
-      const loginUrl = `{apiBase}/api/v1/auth/login`;
+      const loginUrl = `${apiBase}/api/v1/auth/login`;
 
       const response = await fetch(loginUrl, {
         method: "GET",
