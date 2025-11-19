@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     if (!isLoading && !hasRedirectedRef.current) {
       hasRedirectedRef.current = true
       if (!isAuthenticated) {
-        router.push("/login")
+        router.push("/")
       } else if (isAdmin) {
         router.push("/admin/dashboard")
       }

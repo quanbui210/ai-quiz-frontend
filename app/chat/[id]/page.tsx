@@ -116,7 +116,7 @@ export default function ChatPage() {
   }
 
   if (!isAuthenticated) {
-    router.push("/login")
+    router.push("/")
     return null
   }
 
@@ -140,7 +140,7 @@ export default function ChatPage() {
 
   return (
     <MainLayout>
-      <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-4xl flex-col">
+      <div className="-mx-4 -my-6 -mt-16 flex h-screen flex-col bg-gray-50 sm:-mx-6 sm:-my-8 sm:-mt-6">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center gap-4">

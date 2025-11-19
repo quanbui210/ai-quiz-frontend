@@ -49,7 +49,7 @@ export default function SubscriptionPage() {
       !hasRedirectedRef.current
     ) {
       hasRedirectedRef.current = true
-      router.push("/login")
+      router.push("/")
     }
   }, [isAuthenticated, isAuthLoading, isAdmin, router])
 

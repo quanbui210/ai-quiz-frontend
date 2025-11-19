@@ -114,7 +114,7 @@ export function useAuth() {
 
     if (sessionIs401 || userIs401) {
       clearAuth()
-      router.push("/login")
+      router.push("/")
     }
   }, [session, sessionError, userError, clearAuth, router])
 
@@ -229,11 +229,11 @@ export function useAuth() {
   }>("post", {
     onSuccess: () => {
       clearAuth()
-      router.push("/login")
+      router.push("/")
     },
     onError: () => {
       clearAuth()
-      router.push("/login")
+      router.push("/")
     },
   })
 
@@ -263,7 +263,7 @@ export function useAuth() {
       } catch (error) {
         console.error("OAuth callback error:", error)
         setLoading(false)
-        router.push("/login?error=callback_failed")
+        router.push("/?error=callback_failed")
       } finally {
         setLoading(false)
       }

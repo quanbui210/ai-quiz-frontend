@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "From Scrap Dealer to Tech Lead",
+    "title": "",
     "subtitle": "5 years journey",
     "image": "/images/stories/scrap.jpg",
     "imageAlt": "Scrap dealer story",
@@ -13,8 +13,8 @@
   },
   {
     "id": 2,
-    "title": "Fisherman to Freelancer",
-    "subtitle": "Coastal village",
+    "title": "",
+    "subtitle": "",
     "image": "/images/stories/fishermen.jpg",
     "imageAlt": "Fisherman story",
     "gradient": "from-cyan-100 to-blue-100",
@@ -25,7 +25,7 @@
   },
   {
     "id": 3,
-    "title": "From Coffee Shop to Data Science",
+    "title": "",
     "subtitle": "Late 20s career change",
     "image": "/images/stories/locfuho.jpg",
     "imageAlt": "Coffee shop worker story",
@@ -37,7 +37,7 @@
   },
   {
     "id": 4,
-    "title": "From Coffee Shop to Data Science",
+    "title": "e",
     "subtitle": "Late 20s career change",
     "image": "/images/stories/ongchu.jpg",
     "imageAlt": "Coffee shop worker story",

@@ -322,7 +322,7 @@ export default function QuizFromDocumentPage() {
   }
 
   if (!isAuthenticated) {
-    router.push("/login")
+    router.push("/")
     return null
   }
 
