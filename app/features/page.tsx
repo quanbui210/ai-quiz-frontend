@@ -61,11 +61,12 @@ export default function FeaturesPage() {
       icon: MessageSquare,
       title: "AI Tutor",
       description:
-        "Get instant help and explanations from your AI learning assistant. Ask questions, get clarifications, and deepen your understanding anytime.",
+        "Get instant help and explanations from your AI learning assistant using RAG (Retrieval-Augmented Generation) technology. Ask questions, get clarifications, and deepen your understanding anytime with accurate, context-aware responses.",
       details: [
         "Real-time chat interface",
-        "Context-aware responses",
-        "Step-by-step explanations",
+        "RAG-powered accurate responses",
+        "Context-aware explanations",
+        "Step-by-step guidance",
         "Multi-language support",
         "Conversation history",
       ],
@@ -75,13 +76,14 @@ export default function FeaturesPage() {
       icon: FileText,
       title: "Learn from Your Docs",
       description:
-        "Upload any document and generate quizzes automatically. Transform your study materials into interactive learning experiences.",
+        "Upload your documents (PDFs, text files, etc.) and automatically generate personalized quizzes based on the content. Our AI uses RAG (Retrieval-Augmented Generation) technique to analyze your document, extract key concepts, and create relevant questions to help you master the material. Transform your study materials into interactive learning experiences.",
       details: [
         "PDF, DOCX, and text file support",
         "Automatic content extraction",
-        "Smart quiz generation",
+        "Smart quiz generation using RAG",
         "Key concept highlighting",
         "Document-based learning paths",
+        "Continue chat with AI tutor about documents",
       ],
       image: "/images/features/quiz-from-docs.png",
     },

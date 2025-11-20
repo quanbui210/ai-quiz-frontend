@@ -241,7 +241,7 @@ function LandingPageContent() {
                         <Check className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="font-semibold"> AI Tutor</p>
+                        <p className="font-semibold">AI Tutor</p>
                         <p className="text-sm text-blue-100">
                           Get instant help and explanations anytime you need
                         </p>
@@ -254,7 +254,7 @@ function LandingPageContent() {
                       <div>
                         <p className="font-semibold">Learn from Documents</p>
                         <p className="text-sm text-blue-100">
-                          Upload PDFs and generate quizzes automatically
+                          Upload PDFs and generate quizzes or ask questions using RAG technique
                         </p>
                       </div>
                     </div>
@@ -434,9 +434,9 @@ function LandingPageContent() {
 
           <div className="mt-8 border-t border-gray-200 pt-8 text-center">
             <p className="text-sm text-gray-600">
-            © 2025 QuizzAI. All rights reserved. By Quan Bui{" "}   
+              © 2025 QuizzAI. All rights reserved. Built by Quan Bui{" "}
+              <Heart className="inline h-4 w-4 text-red-500" />
             </p>
-            <p className="text-sm text-gray-600">By Quan Bui{" "} <Heart className="inline h-4 w-4 text-red-500" /></p> 
           </div>
       </div>
       </footer>
